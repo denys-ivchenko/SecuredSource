@@ -25,15 +25,14 @@
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
+    <MapFileExtensions>false</MapFileExtensions>
     <SupportUrl>https://telesyk.net/apps/securedsource/</SupportUrl>
     <ErrorReportUrl>https://telesyk.net/apps/securedsource/error</ErrorReportUrl>
     <ProductName>Secured Source</ProductName>
     <PublisherName>Telesyk</PublisherName>
     <SuiteName>Secured Source</SuiteName>
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <AutorunEnabled>true</AutorunEnabled>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <TrustUrlParameters>true</TrustUrlParameters>
     <ApplicationRevision>14</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
@@ -64,10 +63,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>E3D7AA2B25920EE0B3B8388E58D4DC467FC7E4CC</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>8EF8578D9F80F6C7F2F207CC3B8A42B1874E8A25</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>SecuredSource_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>SecuredSource.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -76,7 +75,7 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>a32.ico</ApplicationIcon>
+    <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -85,6 +84,12 @@
     <AssemblyOriginatorKeyFile>SecuredSource.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -110,6 +115,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -129,6 +139,10 @@
     </Compile>
     <None Include="app.manifest" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="SecuredSource.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -150,7 +164,7 @@
     <Resource Include="header-bg.gif" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="a32.ico" />
+    <Resource Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Controls\Controls.csproj">
@@ -171,17 +185,8 @@
       <Visible>False</Visible>
       <Description>Encrypted file by Secured Source</Description>
       <Progid>SecuredSource</Progid>
-      <DefaultIcon>a32.ico</DefaultIcon>
+      <DefaultIcon>app.ico</DefaultIcon>
     </FileAssociation>
-    <FileAssociation Include=".%24%24%24">
-      <Visible>False</Visible>
-      <Description>Encrypted archive by Secured Source</Description>
-      <Progid>SecuredSource</Progid>
-      <DefaultIcon>a32.ico</DefaultIcon>
-    </FileAssociation>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="9_header-bg.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
