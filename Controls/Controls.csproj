@@ -57,17 +57,13 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainAreaUserControl.cs" />
     <Compile Include="MoreFeatures.xaml.cs">
       <DependentUpon>MoreFeatures.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MoreFeaturesMainAreaControl.cs" />
     <Compile Include="SimpleAndFast.xaml.cs">
       <DependentUpon>SimpleAndFast.xaml</DependentUpon>
     </Compile>
     <Compile Include="AreaControl.cs" />
-    <Compile Include="SimpleAndFastMainAreaControl.cs" />
-    <Compile Include="Themes\MoreFeatures.cs" />
     <Page Include="MoreFeatures.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -75,10 +71,6 @@
     <Page Include="SimpleAndFast.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
