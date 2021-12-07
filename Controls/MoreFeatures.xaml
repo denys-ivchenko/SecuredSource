@@ -51,8 +51,9 @@
 		</Style>
 		<Style x:Key="PanelAesPasswordLengthRadio" BasedOn="{StaticResource PanelFieldControl}">
 			<Setter Property="RadioButton.GroupName" Value="AesPasswordLength" />
-			<Setter Property="RadioButton.Width" Value="30" />
-			<Setter Property="RadioButton.Padding" Value="10" />
+			<Setter Property="RadioButton.Width" Value="32" />
+			<Setter Property="Control.FontSize" Value="12" />
+			<Setter Property="RadioButton.VerticalAlignment" Value="Center" />
 		</Style>
 		<Style x:Key="PanelAesPasswordLength">
 			<Setter Property="Control.HorizontalAlignment" Value="Left" />
