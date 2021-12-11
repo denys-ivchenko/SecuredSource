@@ -61,11 +61,92 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Missing Access.
+        /// </summary>
+        public static string AccessMissing {
+            get {
+                return ResourceManager.GetString("AccessMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Add.
+        /// </summary>
+        public static string AddFiles {
+            get {
+                return ResourceManager.GetString("AddFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Algorythm.
         /// </summary>
         public static string Algorythm {
             get {
                 return ResourceManager.GetString("Algorythm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Decrypt.
+        /// </summary>
+        public static string Decrypt {
+            get {
+                return ResourceManager.GetString("Decrypt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Delete.
+        /// </summary>
+        public static string DeleteSelected {
+            get {
+                return ResourceManager.GetString("DeleteSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Deselect all files.
+        /// </summary>
+        public static string DeselectAll {
+            get {
+                return ResourceManager.GetString("DeselectAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Encrypt.
+        /// </summary>
+        public static string Encrypt {
+            get {
+                return ResourceManager.GetString("Encrypt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Files.
+        /// </summary>
+        public static string Files {
+            get {
+                return ResourceManager.GetString("Files", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Author: Denys Ivchenko\r\nPhone: +380969436980\r\n\Email: denys-ivchenko@hotmail.com.
+        /// </summary>
+        public static string InfoDialog {
+            get {
+                return ResourceManager.GetString("InfoDialog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Read access is missed for files.
+        /// </summary>
+        public static string MissingReadFileAccess {
+            get {
+                return ResourceManager.GetString("MissingReadFileAccess", resourceCulture);
             }
         }
         
@@ -79,11 +160,29 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Files.
+        /// </summary>
+        public static string OfFiles {
+            get {
+                return ResourceManager.GetString("OfFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Password Length.
         /// </summary>
         public static string PasswordLength {
             get {
                 return ResourceManager.GetString("PasswordLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select all files.
+        /// </summary>
+        public static string SelectAll {
+            get {
+                return ResourceManager.GetString("SelectAll", resourceCulture);
             }
         }
         

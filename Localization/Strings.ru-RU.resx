@@ -117,14 +117,44 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessMissing" xml:space="preserve">
+    <value>Отсутствует доступ</value>
+  </data>
+  <data name="AddFiles" xml:space="preserve">
+    <value>Добавить файлы</value>
+  </data>
   <data name="Algorythm" xml:space="preserve">
     <value>Алгоритм</value>
+  </data>
+  <data name="Decrypt" xml:space="preserve">
+    <value>Расшифровать</value>
+  </data>
+  <data name="DeleteSelected" xml:space="preserve">
+    <value>Удалить выбранные</value>
+  </data>
+  <data name="DeselectAll" xml:space="preserve">
+    <value>Отменить выделение для всех файлов</value>
+  </data>
+  <data name="Encrypt" xml:space="preserve">
+    <value>Зашифровать</value>
+  </data>
+  <data name="Files" xml:space="preserve">
+    <value>Файлы</value>
+  </data>
+  <data name="MissingReadFileAccess" xml:space="preserve">
+    <value>Отсутствует доступ на чтение таких файлов</value>
   </data>
   <data name="MoreFeatures" xml:space="preserve">
     <value>Больше возможностей</value>
   </data>
+  <data name="OfFiles" xml:space="preserve">
+    <value>Файлов</value>
+  </data>
   <data name="PasswordLength" xml:space="preserve">
     <value>Длина пароля</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Выделить все файлы</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
     <value>Просто и быстро</value>

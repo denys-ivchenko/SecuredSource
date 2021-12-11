@@ -15,13 +15,14 @@ using System.Windows.Shapes;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
-	public abstract class AreaControl : UserControl
+	/// <summary>
+	/// Логика взаимодействия для FileMainAreaControl.xaml
+	/// </summary>
+	public partial class FileMainAreaControl : UserControl
 	{
-		static AreaControl()
+		public FileMainAreaControl()
 		{
-			DefaultStyleKeyProperty.OverrideMetadata(typeof(AreaControl), new FrameworkPropertyMetadata(typeof(AreaControl)));
+			InitializeComponent();
 		}
-
-		public abstract ApplicationMode TargetMode { get; }
 	}
 }

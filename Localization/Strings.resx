@@ -117,14 +117,47 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccessMissing" xml:space="preserve">
+    <value>Missing Access</value>
+  </data>
+  <data name="AddFiles" xml:space="preserve">
+    <value>Add</value>
+  </data>
   <data name="Algorythm" xml:space="preserve">
     <value>Algorythm</value>
+  </data>
+  <data name="Decrypt" xml:space="preserve">
+    <value>Decrypt</value>
+  </data>
+  <data name="DeleteSelected" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeselectAll" xml:space="preserve">
+    <value>Deselect all files</value>
+  </data>
+  <data name="Encrypt" xml:space="preserve">
+    <value>Encrypt</value>
+  </data>
+  <data name="Files" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="InfoDialog" xml:space="preserve">
+    <value>Author: Denys Ivchenko\r\nPhone: +380969436980\r\n\Email: denys-ivchenko@hotmail.com</value>
+  </data>
+  <data name="MissingReadFileAccess" xml:space="preserve">
+    <value>Read access is missed for files</value>
   </data>
   <data name="MoreFeatures" xml:space="preserve">
     <value>More Features</value>
   </data>
+  <data name="OfFiles" xml:space="preserve">
+    <value>Files</value>
+  </data>
   <data name="PasswordLength" xml:space="preserve">
     <value>Password Length</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Select all files</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
     <value>Simple &amp; Fast</value>

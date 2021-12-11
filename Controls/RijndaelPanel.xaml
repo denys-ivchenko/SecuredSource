@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Telesyk.SecuredSource.UI.Controls.RijndaelPanelControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Telesyk.SecuredSource.UI.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="320">
+	<UserControl.Resources>
+	</UserControl.Resources>
+	<StackPanel>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
+		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
+		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
+		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
+		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
+		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
+		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
+		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+	</StackPanel>
+</UserControl>

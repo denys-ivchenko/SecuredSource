@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="Telesyk.SecuredSource.UI.Controls.RC5PanelControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Telesyk.SecuredSource.UI.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="320">
+	<UserControl.Resources>
+	</UserControl.Resources>
+    <StackPanel>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 1:</TextBlock>
+		<CheckBox Style="{StaticResource PanelFieldControl}">Value 1</CheckBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 2:</TextBlock>
+		<CheckBox Style="{StaticResource PanelFieldControl}">Value 2</CheckBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 3:</TextBlock>
+		<CheckBox Style="{StaticResource PanelFieldControl}">Value 3</CheckBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 4:</TextBlock>
+		<CheckBox Style="{StaticResource PanelFieldControl}">Value 4</CheckBox>
+		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 5:</TextBlock>
+		<CheckBox Style="{StaticResource PanelFieldControl}">Value 5</CheckBox>
+	</StackPanel>
+</UserControl>

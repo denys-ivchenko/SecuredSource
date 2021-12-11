@@ -1,0 +1,204 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Style x:Key="Header">
+		<Setter Property="StackPanel.Background">
+			<Setter.Value>
+				<ImageBrush ImageSource="header-bg.gif" />
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<Style x:Key="HeaderContainer">
+		<Setter Property="StackPanel.Margin" Value="8,6" />
+	</Style>
+	<Style x:Key="HeaderRadio">
+		<Setter Property="RadioButton.Foreground" Value="White" />
+		<Setter Property="RadioButton.FontSize" Value="12" />
+		<Setter Property="RadioButton.HorizontalAlignment" Value="Left" />
+		<Setter Property="RadioButton.GroupName" Value="Mode" />
+		<Setter Property="RadioButton.Cursor" Value="Hand" />
+	</Style>
+	<Style x:Key="HeaderSimpleAndFastRadio" BasedOn="{StaticResource HeaderRadio}">
+		<Setter Property="RadioButton.Margin" Value="0,0,0,3" />
+	</Style>
+	<Style x:Key="Footer">
+		<Setter Property="Control.Foreground" Value="#ffffff" />
+		<Setter Property="Grid.Background" Value="#637a8c" />
+		<Setter Property="Control.FontSize" Value="9" />
+		<Setter Property="Control.FontStyle" Value="Italic" />
+	</Style>
+	<Style x:Key="FooterControl">
+		<Setter Property="Control.Margin" Value="8,2" />
+		<Setter Property="StackPanel.Opacity" Value="0.7" />
+	</Style>
+	<Style x:Key="FooterInfo" BasedOn="{StaticResource FooterControl}">
+		<Setter Property="Control.Cursor" Value="Hand" />
+	</Style>
+	<Style x:Key="FooterCopyright" BasedOn="{StaticResource FooterControl}">
+		<Setter Property="StackPanel.Orientation" Value="Horizontal" />
+		<Setter Property="StackPanel.HorizontalAlignment" Value="Right" />
+	</Style>
+	<Style x:Key="FooterVersion" BasedOn="{StaticResource FooterControl}">
+		<Setter Property="Control.Margin" Value="8,0,0,0" />
+		<Setter Property="Control.Foreground" Value="#b7ccdd" />
+	</Style>
+
+
+	<Style x:Key="ColumnPanel">
+		<Setter Property="ColumnDefinition.MinWidth" Value="150" />
+		<Setter Property="ColumnDefinition.MaxWidth" Value="300" />
+	</Style>
+	<Style x:Key="Panel">
+		<Setter Property="DockPanel.Background" Value="#dfecf7" />
+		<Setter Property="Control.Foreground" Value="#455868" />
+		<Setter Property="Control.FontSize" Value="12" />
+	</Style>
+	<Style x:Key="PanelContainer" BasedOn="{StaticResource Panel}">
+		<Setter Property="Control.Margin" Value="12,0,7,8" />
+	</Style>
+	<Style x:Key="PanelFieldHeader">
+		<Setter Property="Control.Margin" Value="1,8,0,4" />
+	</Style>
+	<Style x:Key="PanelFieldControl">
+		<Setter Property="Control.FontSize" Value="11" />
+		<Setter Property="Control.Foreground" Value="#19222a" />
+	</Style>
+	<Style x:Key="Splitter">
+		<Setter Property="Control.Background" Value="#dfecf7" />
+		<Setter Property="GridSplitter.Width" Value="5" />
+		<Setter Property="GridSplitter.HorizontalAlignment" Value="Center" />
+		<Setter Property="GridSplitter.VerticalAlignment" Value="Stretch" />
+		<Setter Property="GridSplitter.Effect">
+			<Setter.Value>
+				<DropShadowEffect Direction="0" Opacity="0.75" ShadowDepth="3" BlurRadius="6" Color="#dde3e8" />
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<Style x:Key="AreaBeginer">
+		<Setter Property="Control.Background" Value="#dfecf7" />
+		<Setter Property="Canvas.Height" Value="8" />
+		<Setter Property="Canvas.Margin" Value="0,-8,0,0" />
+		<Setter Property="Canvas.Effect">
+			<Setter.Value>
+				<DropShadowEffect Direction="270" Opacity="0.9" ShadowDepth="3" BlurRadius="6" Color="#dde3e8" />
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<Style x:Key="MainArea">
+		<Setter Property="Control.Margin" Value="12,8,12,12" />
+	</Style>
+	<Style x:Key="FilesArea">
+		<Setter Property="Control.Height" Value="220" />
+	</Style>
+	<Style x:Key="FileButtons">
+		<Setter Property="Control.Height" Value="22" />
+	</Style>
+	<Style x:Key="FileButton">
+		<Setter Property="Image.Width" Value="16" />
+		<Setter Property="Image.Height" Value="16" />
+		<Setter Property="Image.Margin" Value="0,4,4,0" />
+		<Setter Property="Image.Cursor" Value="Hand" />
+		<Setter Property="Image.Source" Value="/resources/add.gif" />
+		<Setter Property="Button.SnapsToDevicePixels" Value="True" />
+		<Setter Property="Image.Effect">
+			<Setter.Value>
+				<DropShadowEffect Direction="315" Opacity="0.8" ShadowDepth="3" BlurRadius="3" Color="#b9cad7" />
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Button.Template">
+			<Setter.Value>
+				<ControlTemplate></ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<Style x:Key="FileButtonDown" BasedOn="{StaticResource FileButton}">
+		<Setter Property="Control.Margin" Value="1,6,3,0" />
+		<Setter Property="Image.Effect">
+			<Setter.Value>
+				<DropShadowEffect Direction="305" Opacity="0.5" ShadowDepth="2" BlurRadius="1" Color="#b9cad7" />
+			</Setter.Value>
+		</Setter>
+	</Style>
+	<Style x:Key="FileButtonDelete" BasedOn="{StaticResource FileButton}">
+		<Setter Property="Image.Source" Value="delete.gif" />
+	</Style>
+	<Style x:Key="FileButtonDeleteDown" BasedOn="{StaticResource FileButtonDown}">
+		<Setter Property="Image.Source" Value="delete.gif" />
+	</Style>
+	<Style x:Key="FileButtonDeleteDisabled" BasedOn="{StaticResource FileButtonDelete}">
+		<Setter Property="Control.Opacity" Value="0.3" />
+	</Style>
+	<Style x:Key="FileButtonSelectAll" BasedOn="{StaticResource FileButton}">
+		<Setter Property="Image.Source" Value="select-all.gif" />
+	</Style>
+	<Style x:Key="FileButtonSelectAllDown" BasedOn="{StaticResource FileButtonDown}">
+		<Setter Property="Image.Source" Value="select-all.gif" />
+	</Style>
+	<Style x:Key="FileButtonSelectAllDisabled" BasedOn="{StaticResource FileButtonSelectAll}">
+		<Setter Property="Control.Opacity" Value="0.3" />
+	</Style>
+	<Style x:Key="FileButtonDeselectAll" BasedOn="{StaticResource FileButton}">
+		<Setter Property="Image.Source" Value="deselect-all.gif" />
+	</Style>
+	<Style x:Key="FileButtonDeselectAllDown" BasedOn="{StaticResource FileButtonDown}">
+		<Setter Property="Image.Source" Value="deselect-all.gif" />
+	</Style>
+	<Style x:Key="FileButtonDeselectAllDisabled" BasedOn="{StaticResource FileButtonDeselectAll}">
+		<Setter Property="Control.Opacity" Value="0.3" />
+	</Style>
+	<Style x:Key="ButtonsArea">
+		<Setter Property="Control.HorizontalAlignment" Value="Right" />
+		<Style.Resources>
+			<Style TargetType="Button">
+				<Setter Property="Control.Margin" Value="12,12,0,0" />
+			</Style>
+		</Style.Resources>
+	</Style>
+	<Style x:Key="TextCaption">
+		<Setter Property="Control.Margin" Value="0,0,0,4" />
+		<Setter Property="Control.FontSize" Value="14" />
+		<Setter Property="Control.Foreground" Value="#455868" />
+	</Style>
+	<Style x:Key="PanelAesPasswordLengthRadio" BasedOn="{StaticResource PanelFieldControl}">
+		<Setter Property="RadioButton.GroupName" Value="AesPasswordLength" />
+		<Setter Property="RadioButton.Width" Value="32" />
+		<Setter Property="Control.FontSize" Value="12" />
+		<Setter Property="RadioButton.VerticalAlignment" Value="Center" />
+	</Style>
+	<Style x:Key="PanelAesPasswordLength">
+		<Setter Property="Control.HorizontalAlignment" Value="Left" />
+		<Style.Resources>
+			<Style TargetType="RadioButton" BasedOn="{StaticResource PanelAesPasswordLengthRadio}" />
+		</Style.Resources>
+	</Style>
+	<Style x:Key="PanelAesPasswordLengthTwo" BasedOn="{StaticResource PanelAesPasswordLength}">
+		<Setter Property="Control.HorizontalAlignment" Value="Center" />
+	</Style>
+	<Style x:Key="PanelAesPasswordLengthThree" BasedOn="{StaticResource PanelAesPasswordLength}">
+		<Setter Property="Control.HorizontalAlignment" Value="Right" />
+		<Setter Property="Control.Margin" Value="0,0,1,0" />
+	</Style>
+	<Style x:Key="File">
+		<Setter Property="Control.Margin" Value="2,1" />
+		<Setter Property="Control.FontSize" Value="12" />
+		<Setter Property="Control.VerticalAlignment" Value="Center" />
+		<Style.Resources>
+			<Style TargetType="TextBlock">
+				<Setter Property="Control.FontSize" Value="11" />
+				<Setter Property="Control.Foreground" Value="#19222a" />
+				<Setter Property="Control.Margin" Value="3,1,3,3" />
+			</Style>
+		</Style.Resources>
+	</Style>
+	<Style x:Key="FileSelected" BasedOn="{StaticResource File}">
+		<Setter Property="Control.Background" Value="#e1ebf3" />
+	</Style>
+	<Style x:Key="FileCountContainer">
+		<Setter Property="Control.HorizontalAlignment" Value="Right" />
+		<Setter Property="Control.Margin" Value="0,4,4,0" />
+		<Setter Property="Control.Foreground" Value="#455868" />
+		<Setter Property="Control.FontSize" Value="11" />
+	</Style>
+	<Style x:Key="FileCount">
+		<Setter Property="Control.Foreground" Value="#19222a" />
+	</Style>
+</ResourceDictionary>

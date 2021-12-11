@@ -1,13 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+
+using Microsoft.Win32;
+
+using Telesyk.SecuredSource.Globalization;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
 	public partial class MoreFeaturesAreaControl : UserControl
 	{
 		#region Private declarations
+
+		private Dictionary<EncryptionAlgorythm, UserControl> _panels = new Dictionary<EncryptionAlgorythm, UserControl>();
 
 		#endregion
 
@@ -16,11 +24,15 @@ namespace Telesyk.SecuredSource.UI.Controls
 		public MoreFeaturesAreaControl()
 		{
 			InitializeComponent();
+
+			init();
 		}
 
 		#endregion
 
 		#region Public properties
+
+		public PackData FilePack { get => ControlFiles.FilePack; }
 
 		#endregion
 
@@ -34,46 +46,74 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Private methods
 
-		private void init(Grid grid)
+		private void init()
 		{
-			var ColumnPanel = (ColumnDefinition)grid.FindName("ColumnPanel");
-			ColumnPanel.Width = new GridLength(ApplicationSettings.Current.LastPanelWidth);
+			ColumnPanel.Width = new GridLength(ApplicationSettings.Current.PanelWidth);
 
-			var selectAlgorythm = (ComboBox)grid.FindName("SelectAlgorythm");
-			selectAlgorythm.ItemsSource = Enum.GetNames(typeof(EncryptionAlgorythm));
-			selectAlgorythm.SelectedValue = ApplicationSettings.Current.LastAlgorythm.ToString();
-
-			((RadioButton)grid.FindName($"RadioAesPasswordLength{ApplicationSettings.Current.LastAesPasswordLength}")).IsChecked = true;
+			SelectAlgorythm.ItemsSource = Enum.GetNames(typeof(EncryptionAlgorythm));
+			SelectAlgorythm.SelectedValue = ApplicationSettings.Current.Algorythm.ToString();
 		}
 
 		#region Handlers
 
-		private void Grid_Initialized(object sender, EventArgs e)
-		{
-			init((Grid)sender);
-		}
-
 		private void Splitter_DragCompleted(object sender, DragCompletedEventArgs e)
 		{
-			var splitter = ((GridSplitter)sender);
-			var parent = (Grid)splitter.Parent;
-
-			ApplicationSettings.Current.LastPanelWidth = (int)((ColumnDefinition)parent.FindName("ColumnPanel")).ActualWidth;
+			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth;
 		}
 
 		private void SelectAlgorythm_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			Enum.TryParse<EncryptionAlgorythm>(((ComboBox)sender).SelectedValue.ToString(), out EncryptionAlgorythm algorythm);
-			ApplicationSettings.Current.LastAlgorythm = algorythm;
-		}
+			Enum.TryParse<EncryptionAlgorythm>(SelectAlgorythm.SelectedValue.ToString(), out EncryptionAlgorythm algorythm);
+			ApplicationSettings.Current.Algorythm = algorythm;
 
-		private void RadioAesPasswordLength_Checked(object sender, RoutedEventArgs e)
-		{
-			int.TryParse(((RadioButton)sender).Content.ToString(), out int length);
-			ApplicationSettings.Current.LastAesPasswordLength = length;
+			setPanelByAlgorythm();
 		}
 
 		#endregion
+
+		private void setPanelByAlgorythm()
+		{
+			ensurePanelControl();
+
+			UserControl panel = _panels[ApplicationSettings.Current.Algorythm];
+
+			if (PanelLoad.Children.Count > 0)
+				if (PanelLoad.Children[0] == panel)
+					return;
+				else
+					PanelLoad.Children.Clear();
+
+			PanelLoad.Children.Add(panel);
+		}
+
+		private void ensurePanelControl()
+		{
+			if (!_panels.ContainsKey(ApplicationSettings.Current.Algorythm))
+			{
+				UserControl panel = null;
+
+				switch (ApplicationSettings.Current.Algorythm)
+				{
+					case (EncryptionAlgorythm.Aes):
+						panel = new AesPanelControl();
+						break;
+					case (EncryptionAlgorythm.Rijndael):
+						panel = new RijndaelPanelControl();
+						break;
+					case (EncryptionAlgorythm.DES):
+						panel = new DESPanelControl();
+						break;
+					case (EncryptionAlgorythm.TripleDES):
+						panel = new TripleDESPanelControl();
+						break;
+					case (EncryptionAlgorythm.RC5):
+						panel = new RC5PanelControl();
+						break;
+				}
+
+				_panels.Add(ApplicationSettings.Current.Algorythm, panel);
+			}
+		}
 
 		#endregion
 	}

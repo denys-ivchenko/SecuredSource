@@ -6,50 +6,9 @@
         xmlns:local="clr-namespace:Telesyk.SecuredSource.UI"
         xmlns:res="clr-namespace:Telesyk.SecuredSource.Globalization;assembly=Telesyk.SecuredSource.Localization"
         mc:Ignorable="d"
-        Title="{x:Static res:Strings.Title}" FontFamily="Segoe UI" FontSize="10" Height="400" Width="500" MinHeight="400" MinWidth="500" WindowStyle="SingleBorderWindow">
-	<Window.Resources>
-		<Style x:Key="Header">
-			<Setter Property="StackPanel.Background">
-				<Setter.Value>
-					<ImageBrush ImageSource="/header-bg.gif" />
-				</Setter.Value>
-			</Setter>
-		</Style>
-		<Style x:Key="HeaderContainer">
-			<Setter Property="StackPanel.Margin" Value="8,6" />
-		</Style>
-		<Style x:Key="HeaderRadio">
-			<Setter Property="RadioButton.Foreground" Value="White" />
-			<Setter Property="RadioButton.FontSize" Value="12" />
-			<Setter Property="RadioButton.HorizontalAlignment" Value="Left" />
-			<Setter Property="RadioButton.GroupName" Value="Mode" />
-			<Setter Property="RadioButton.Cursor" Value="Hand" />
-		</Style>
-		<Style x:Key="HeaderSimpleAndFastRadio" BasedOn="{StaticResource HeaderRadio}">
-			<Setter Property="RadioButton.Margin" Value="0,0,0,3" />
-		</Style>
-		<Style x:Key="Footer">
-			<Setter Property="Control.Foreground" Value="#ffffff" />
-			<Setter Property="Grid.Background" Value="#637a8c" />
-			<Setter Property="Control.FontSize" Value="9" />
-			<Setter Property="Control.FontStyle" Value="Italic" />
-		</Style>
-		<Style x:Key="FooterControl">
-			<Setter Property="Control.Margin" Value="8,2" />
-			<Setter Property="StackPanel.Opacity" Value="0.7" />
-		</Style>
-		<Style x:Key="FooterInfo" BasedOn="{StaticResource FooterControl}">
-			<Setter Property="Control.Cursor" Value="Hand" />
-		</Style>
-		<Style x:Key="FooterCopyright" BasedOn="{StaticResource FooterControl}">
-			<Setter Property="StackPanel.Orientation" Value="Horizontal" />
-			<Setter Property="StackPanel.HorizontalAlignment" Value="Right" />
-		</Style>
-		<Style x:Key="FooterVersion" BasedOn="{StaticResource FooterControl}">
-			<Setter Property="Control.Margin" Value="8,0,0,0" />
-			<Setter Property="Control.Foreground" Value="#b7ccdd" />
-		</Style>
-	</Window.Resources>
+		SizeChanged="Window_SizeChanged"
+		LocationChanged="Window_LocationChanged"
+        Title="{x:Static res:Strings.Title}" FontFamily="Segoe UI" FontSize="10" Height="400" Width="600" MinHeight="400" MinWidth="600" WindowStyle="SingleBorderWindow">
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="47" />
@@ -68,7 +27,7 @@
 				<ColumnDefinition />
 				<ColumnDefinition />
 			</Grid.ColumnDefinitions>
-			<TextBlock Grid.Column="0" Style="{StaticResource FooterInfo}" ToolTip="?">ϞϞ</TextBlock>
+			<TextBlock Grid.Column="0" Style="{StaticResource FooterInfo}" ToolTip="?" MouseDown="TextBlock_MouseEnter">ϞϞ</TextBlock>
 			<StackPanel Grid.Column="1" Style="{StaticResource FooterCopyright}">
 				<TextBlock>Copyright @ Telesyk, 2021.</TextBlock>
 				<TextBlock Style="{StaticResource FooterVersion}">ver. <Run x:Name="textVersion" x:FieldModifier="private" /></TextBlock>

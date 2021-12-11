@@ -57,14 +57,83 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DESPanel.xaml.cs">
+      <DependentUpon>DESPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AesMainArea.xaml.cs">
+      <DependentUpon>AesMainArea.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="File.xaml.cs">
+      <DependentUpon>File.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FileMainArea.xaml.cs">
+      <DependentUpon>FileMainArea.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Files.xaml.cs">
+      <DependentUpon>Files.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PackMainArea.xaml.cs">
+      <DependentUpon>PackMainArea.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RC5Panel.xaml.cs">
+      <DependentUpon>RC5Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TripleDESPanel.xaml.cs">
+      <DependentUpon>TripleDESPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MoreFeatures.xaml.cs">
       <DependentUpon>MoreFeatures.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AesPanel.xaml.cs">
+      <DependentUpon>AesPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RijndaelPanel.xaml.cs">
+      <DependentUpon>RijndaelPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="SimpleAndFast.xaml.cs">
       <DependentUpon>SimpleAndFast.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AreaControl.cs" />
+    <Page Include="DESPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AesMainArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="File.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FileMainArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Files.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PackMainArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RC5Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TripleDESPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MoreFeatures.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AesPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RijndaelPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

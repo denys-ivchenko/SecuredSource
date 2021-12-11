@@ -17,21 +17,27 @@ namespace Telesyk.SecuredSource
 
 		private const string _APPDIRECTORY_PATH = "Telesyk/SecuredSource";
 		private const string _SETTINGS_FILE = "settings.config";
-		private const string _NODENAME_LAST_MODE = "mode";
-		private const string _NODENAME_LAST_PANEL_WIDTH = "panel-width";
-		private const string _NODENAME_LAST_DIRECTORY = "directory";
-		private const string _NODENAME_LAST_ALGORYTHM = "algorythm";
-		private const string _NODENAME_LAST_AES_KEY_LENGTH = "aes-key-length";
-		private const string _NODENAME_LAST_AES_PASSWORD_LENGTH = "aes-password-length";
+		private const string _NODENAME_WINDOW_WIDTH = "window-width";
+		private const string _NODENAME_WINDOW_HEIGHT = "window-height";
+		private const string _NODENAME_WINDOW_TOP = "window-top";
+		private const string _NODENAME_WINDOW_LEFT = "window-left";
+		private const string _NODENAME_MODE = "mode";
+		private const string _NODENAME_PANEL_WIDTH = "panel-width";
+		private const string _NODENAME_DIRECTORY = "directory";
+		private const string _NODENAME_ALGORYTHM = "algorythm";
+		private const string _NODENAME_AES_PASSWORD_LENGTH = "aes-password-length";
 
 		#endregion
 
-		private ApplicationMode _lastMode = ApplicationMode.SimpleAndFast;
-		private int _lastPanelWidth = 160;
-		private string _lastDirectory = null;
-		private int _lastAesKeyLength = 128;
-		private int _lastAesPasswordLength = 16;
-		private EncryptionAlgorythm _lastAlgorythm = EncryptionAlgorythm.Aes;
+		private ApplicationMode _mode = ApplicationMode.SimpleAndFast;
+		private int _windowWidth = 600;
+		private int _windowHeight = 400;
+		private int _windowTop = 200;
+		private int _windowLeft = 400;
+		private int _panelWidth = 160;
+		private string _directory = null;
+		private int _aesPasswordLength = 16;
+		private EncryptionAlgorythm _algorythm = EncryptionAlgorythm.RC5;
 
 		#endregion
 
@@ -56,40 +62,58 @@ namespace Telesyk.SecuredSource
 
 		public static ApplicationSettings Current { get => _instance.Value; }
 
-		public ApplicationMode LastMode
+		public ApplicationMode Mode
 		{
-			get { return _lastMode; }
-			set { _lastMode = writeSettingValue(_NODENAME_LAST_MODE, value); }
+			get { return _mode; }
+			set { _mode = writeSettingValue(_NODENAME_MODE, value); }
 		}
 
-		public int LastPanelWidth
+		public int WindowWidth
 		{
-			get => _lastPanelWidth;
-			set { _lastPanelWidth = writeSettingValue(_NODENAME_LAST_PANEL_WIDTH, value); }
+			get => _windowWidth;
+			set { _windowWidth = writeSettingValue(_NODENAME_WINDOW_WIDTH, value); }
 		}
 
-		public string LastDirectory
+		public int WindowHeight
 		{
-			get => _lastDirectory;
-			set { _lastDirectory = writeSettingValue(_NODENAME_LAST_DIRECTORY, value); }
+			get => _windowHeight;
+			set { _windowHeight = writeSettingValue(_NODENAME_WINDOW_HEIGHT, value); }
 		}
 
-		public EncryptionAlgorythm LastAlgorythm
+		public int WindowTop
 		{
-			get => _lastAlgorythm;
-			set { _lastAlgorythm = writeSettingValue(_NODENAME_LAST_ALGORYTHM, value); }
+			get => _windowTop;
+			set { _windowTop = writeSettingValue(_NODENAME_WINDOW_TOP, value); }
 		}
 
-		public int LastAesKeyLength
+		public int WindowLeft
 		{
-			get => _lastAesKeyLength;
-			set { _lastAesKeyLength = writeSettingValue(_NODENAME_LAST_AES_KEY_LENGTH, value); }
+			get => _windowLeft;
+			set { _windowLeft = writeSettingValue(_NODENAME_WINDOW_LEFT, value); }
 		}
 
-		public int LastAesPasswordLength
+		public int PanelWidth
 		{
-			get => _lastAesPasswordLength;
-			set { _lastAesPasswordLength = writeSettingValue(_NODENAME_LAST_AES_PASSWORD_LENGTH, value); }
+			get => _panelWidth;
+			set { _panelWidth = writeSettingValue(_NODENAME_PANEL_WIDTH, value); }
+		}
+
+		public string Directory
+		{
+			get => _directory;
+			set { _directory = writeSettingValue(_NODENAME_DIRECTORY, value); }
+		}
+
+		public EncryptionAlgorythm Algorythm
+		{
+			get => _algorythm;
+			set { _algorythm = writeSettingValue(_NODENAME_ALGORYTHM, value); }
+		}
+
+		public int AesPasswordLength
+		{
+			get => _aesPasswordLength;
+			set { _aesPasswordLength = writeSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value); }
 		}
 
 		#endregion
@@ -101,7 +125,6 @@ namespace Telesyk.SecuredSource
 		private void init()
 		{
 			ensureSettingsXml();
-			
 			readSettings();
 		}
 
@@ -111,69 +134,16 @@ namespace Telesyk.SecuredSource
 
 		private void readSettings()
 		{
-			readLastModeSetting();
-			readLastMenuWidthSetting();
-			readLastDirectorySetting();
-			readLastAlgorythmSetting();
-			readLastAesKeyLengthSetting();
-			readLastAesPasswordLengthSetting();
-		}
 
-		private void readLastModeSetting()
-		{
-			var value = readSettingValue(_NODENAME_LAST_MODE);
-
-			if (!Enum.TryParse<ApplicationMode>(value, out ApplicationMode mode))
-				writeSettingValue(_NODENAME_LAST_MODE, LastMode);
-			else
-				_lastMode = mode;
-		}
-
-		private void readLastMenuWidthSetting()
-		{
-			var value = readSettingValue(_NODENAME_LAST_PANEL_WIDTH);
-
-			if (!int.TryParse(value, out int menuWidth))
-				writeSettingValue(_NODENAME_LAST_PANEL_WIDTH, LastPanelWidth);
-			else
-				_lastPanelWidth = menuWidth;
-		}
-
-		private void readLastDirectorySetting()
-		{
-			var value = readSettingValue(_NODENAME_LAST_DIRECTORY);
-
-			_lastDirectory = value;
-		}
-
-		private void readLastAlgorythmSetting()
-		{
-			var value = readSettingValue(_NODENAME_LAST_ALGORYTHM);
-
-			if (!Enum.TryParse<EncryptionAlgorythm>(value, out EncryptionAlgorythm algorythm))
-				writeSettingValue(_NODENAME_LAST_MODE, LastAlgorythm);
-			else
-				_lastAlgorythm = algorythm;
-		}
-
-		private void readLastAesKeyLengthSetting()
-		{
-			var value = readSettingValue(_NODENAME_LAST_AES_KEY_LENGTH);
-
-			if (!int.TryParse(value, out int length))
-				writeSettingValue(_NODENAME_LAST_AES_KEY_LENGTH, LastAesKeyLength);
-			else
-				_lastAesKeyLength = length;
-		}
-
-		private void readLastAesPasswordLengthSetting()
-		{
-			var value = readSettingValue(_NODENAME_LAST_AES_PASSWORD_LENGTH);
-
-			if (!int.TryParse(value, out int length))
-				writeSettingValue(_NODENAME_LAST_AES_PASSWORD_LENGTH, LastAesPasswordLength);
-			else
-				_lastAesPasswordLength = length;
+			readEnumSetting<ApplicationMode>(_NODENAME_MODE, ref _mode);
+			readIntegerSetting(_NODENAME_WINDOW_WIDTH, ref _windowWidth);
+			readIntegerSetting(_NODENAME_WINDOW_HEIGHT, ref _windowHeight);
+			readIntegerSetting(_NODENAME_WINDOW_TOP, ref _windowTop);
+			readIntegerSetting(_NODENAME_WINDOW_LEFT, ref _windowLeft);
+			readIntegerSetting(_NODENAME_PANEL_WIDTH, ref _panelWidth);
+			readStringSetting(_NODENAME_DIRECTORY, ref _directory);
+			readEnumSetting<EncryptionAlgorythm>(_NODENAME_ALGORYTHM, ref _algorythm);
+			readIntegerSetting(_NODENAME_AES_PASSWORD_LENGTH, ref _aesPasswordLength);
 		}
 
 		#endregion
@@ -193,11 +163,39 @@ namespace Telesyk.SecuredSource
 			return node;
 		}
 
-		private string readSettingValue(string nodeName)
+		private void readStringSetting(string nodeName, ref string value) => readStringSetting(nodeName, ref value, false);
+
+		private void readStringSetting(string nodeName, ref string value, bool skipWriteIfEmpty)
 		{
 			var node = getSettingNode("last/" + nodeName);
 
-			return node.InnerText;
+			if (!skipWriteIfEmpty && string.IsNullOrWhiteSpace(node.InnerText) && !string.IsNullOrWhiteSpace(value))
+				writeSettingValue<string>(nodeName, value);
+			else
+				value = node.InnerText;
+		}
+
+		private void readEnumSetting<T>(string nodeName, ref T value)
+			where T : struct
+		{
+			string data = null;
+			readStringSetting(nodeName, ref data);
+
+			if (!Enum.TryParse<T>(data, out T result))
+				writeSettingValue(nodeName, value);
+			else
+				value = result;
+		}
+
+		private void readIntegerSetting(string nodeName, ref int value)
+		{
+			string data = null;
+			readStringSetting(nodeName, ref data, true);
+
+			if (!int.TryParse(data, out int result))
+				writeSettingValue(nodeName, value);
+			else
+				value = result;
 		}
 
 		private T writeSettingValue<T>(string nodeName, T value) => writeSettingValue(nodeName, value, false);
@@ -227,12 +225,15 @@ namespace Telesyk.SecuredSource
 			SettingsXml = new XmlDocument();
 			SettingsXml.LoadXml(Properties.Resources.Settings);
 
-			writeSettingValue(_NODENAME_LAST_MODE, LastMode, true);
-			writeSettingValue(_NODENAME_LAST_PANEL_WIDTH, LastPanelWidth, true);
-			writeSettingValue(_NODENAME_LAST_DIRECTORY, LastDirectory, true);
-			writeSettingValue(_NODENAME_LAST_ALGORYTHM, LastAlgorythm, true);
-			writeSettingValue(_NODENAME_LAST_AES_KEY_LENGTH, LastAesKeyLength, true);
-			writeSettingValue(_NODENAME_LAST_AES_PASSWORD_LENGTH, LastAesPasswordLength, true);
+			writeSettingValue(_NODENAME_MODE, Mode, true);
+			writeSettingValue(_NODENAME_WINDOW_WIDTH, WindowWidth, true);
+			writeSettingValue(_NODENAME_WINDOW_HEIGHT, WindowHeight, true);
+			writeSettingValue(_NODENAME_WINDOW_TOP, WindowTop, true);
+			writeSettingValue(_NODENAME_WINDOW_LEFT, WindowLeft, true);
+			writeSettingValue(_NODENAME_PANEL_WIDTH, PanelWidth, true);
+			writeSettingValue(_NODENAME_DIRECTORY, Directory, true);
+			writeSettingValue(_NODENAME_ALGORYTHM, Algorythm, true);
+			writeSettingValue(_NODENAME_AES_PASSWORD_LENGTH, AesPasswordLength, true);
 
 			SettingsXml.Save(XmlFilePath);
 		}
@@ -258,8 +259,8 @@ namespace Telesyk.SecuredSource
 			{
 				appPath = Path.Combine(appPath, paths[i]);
 
-				if (!Directory.Exists(appPath))
-					Directory.CreateDirectory(appPath);
+				if (!System.IO.Directory.Exists(appPath))
+					System.IO.Directory.CreateDirectory(appPath);
 			}
 
 			return appPath;
