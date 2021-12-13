@@ -1,27 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Telesyk.SecuredSource
 {
 	[Serializable]
-	public sealed class PackData : IEnumerable<FileData>
+	public sealed class PackData : IEnumerable<FileData>, IDeserializationCallback
 	{
 		#region Private declarations
-
+		
 		private List<FileData> _files = new List<FileData>();
-
+		[NonSerialized]
 		private SortedDictionary<string, FileData> _names = new SortedDictionary<string, FileData>();
-
+		[NonSerialized]
 		private Dictionary<string, FileData> _fullNames = new Dictionary<string, FileData>();
-
-		private int _fileCount;
 
 		#endregion
 
 		#region Constructors
+
+		public PackData()
+		{
+			
+		}
 
 		#endregion
 
@@ -48,7 +52,9 @@ namespace Telesyk.SecuredSource
 
 		public string PasswordHash { get; internal set; }
 
-		public int FileCount { get => _fileCount; internal set => _fileCount = value; }
+		public int FileCount { get => _files.Count; }
+
+		public int TotalBytes { get; private set; }
 
 		#endregion
 
@@ -62,6 +68,14 @@ namespace Telesyk.SecuredSource
 
 		internal void Clear() => clear();
 
+		#region Static methods
+
+		public static byte[] Serialize(PackData packData) => serialize(packData);
+
+		public static PackData Deserialize(byte[] bytes) => deserialize(bytes);
+
+		#endregion
+
 		#endregion
 
 		#region Interface implementations
@@ -73,9 +87,23 @@ namespace Telesyk.SecuredSource
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+		public void OnDeserialization(object sender)
+		{
+			var files = _files;
+
+			_files = new List<FileData>();
+			_names = new SortedDictionary<string, FileData>();
+			_fullNames = new Dictionary<string, FileData>();
+
+			foreach (var file in files)
+				Add(file);
+		}
+
 		#endregion
 
 		#region Private methods
+
+		#region Instance methods
 
 		private void recalculateNames()
 		{
@@ -130,7 +158,7 @@ namespace Telesyk.SecuredSource
 			_names.Add(normalizeKey(file.Name), file);
 			_files.Add(file);
 
-			FileCount = _files.Count;
+			TotalBytes += file.ByteCount;
 
 			return true;
 		}
@@ -149,7 +177,7 @@ namespace Telesyk.SecuredSource
 			_names.Remove(normalizeKey(file.Name));
 			_fullNames.Remove(normalizeKey(file.FullName));
 
-			FileCount = _files.Count;
+			TotalBytes -= file.ByteCount;
 
 			if (!skipRecalculating)
 				recalculateNames();
@@ -161,7 +189,7 @@ namespace Telesyk.SecuredSource
 			_names.Clear();
 			_fullNames.Clear();
 
-			FileCount = _files.Count;
+			TotalBytes = 0;
 		}
 
 		private FileData[] copy()
@@ -178,17 +206,31 @@ namespace Telesyk.SecuredSource
 			return key.Replace('/', '\\').ToUpper();
 		}
 
-		public void test(FileData file)
+		#endregion
+
+		#region Static methods
+
+		private static byte[] serialize(PackData pack)
 		{
-			BinaryFormatter f = new BinaryFormatter();
+			BinaryFormatter formatter = new BinaryFormatter();
 
 			using (var stream = new MemoryStream())
 			{
-				f.Serialize(stream, file);
-				stream.Position = 0;
-				var de = (FileData)f.Deserialize(stream);
+				formatter.Serialize(stream, pack);
+
+				return stream.ToArray();
 			}
 		}
+
+		private static PackData deserialize(byte[] bytes)
+		{
+			BinaryFormatter formatter = new BinaryFormatter();
+
+			using (var stream = new MemoryStream(bytes))
+				return (PackData)formatter.Deserialize(stream);
+		}
+
+		#endregion
 
 		#endregion
 	}

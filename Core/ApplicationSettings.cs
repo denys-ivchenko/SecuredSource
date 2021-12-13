@@ -26,6 +26,10 @@ namespace Telesyk.SecuredSource
 		private const string _NODENAME_DIRECTORY = "directory";
 		private const string _NODENAME_ALGORYTHM = "algorythm";
 		private const string _NODENAME_AES_PASSWORD_LENGTH = "aes-password-length";
+		private const string _NODENAME_RIJNDAEL_PASSWORD_LENGTH = "rijndael-password-length";
+		private const string _NODENAME_DES_PASSWORD_LENGTH = "des-password-length";
+		private const string _NODENAME_TRIPLEDES_PASSWORD_LENGTH = "tripledes-password-length";
+		private const string _NODENAME_RC5_PASSWORD_LENGTH = "rc5-password-length";
 
 		#endregion
 
@@ -37,6 +41,10 @@ namespace Telesyk.SecuredSource
 		private int _panelWidth = 160;
 		private string _directory = null;
 		private int _aesPasswordLength = 16;
+		private int _rijndaelPasswordLength = 12;
+		private int _desPasswordLength = 5;
+		private int _tripleDesPasswordLength = 8;
+		private int _rc5PasswordLength = 11;
 		private EncryptionAlgorythm _algorythm = EncryptionAlgorythm.RC5;
 
 		#endregion
@@ -61,6 +69,28 @@ namespace Telesyk.SecuredSource
 		#region Public properties
 
 		public static ApplicationSettings Current { get => _instance.Value; }
+
+		public int PasswordLength
+		{
+			get
+			{
+				switch(Algorythm)
+				{
+					case EncryptionAlgorythm.Aes:
+						return AesPasswordLength;
+					case EncryptionAlgorythm.Rijndael:
+						return RijndaelPasswordLength;
+					case EncryptionAlgorythm.DES:
+						return DESPasswordLength;
+					case EncryptionAlgorythm.TripleDES:
+						return TripleDESPasswordLength;
+					case EncryptionAlgorythm.RC5:
+						return RC5PasswordLength;
+				}
+
+				return 0;
+			}
+		}
 
 		public ApplicationMode Mode
 		{
@@ -107,14 +137,44 @@ namespace Telesyk.SecuredSource
 		public EncryptionAlgorythm Algorythm
 		{
 			get => _algorythm;
-			set { _algorythm = writeSettingValue(_NODENAME_ALGORYTHM, value); }
+			set { changeAlgorythmSettingValue(_NODENAME_ALGORYTHM, value, ref _algorythm, true); }
 		}
 
 		public int AesPasswordLength
 		{
 			get => _aesPasswordLength;
-			set { _aesPasswordLength = writeSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value); }
+			set { changeAlgorythmSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value, ref _aesPasswordLength, EncryptionAlgorythm.Aes == Algorythm); }
 		}
+
+		public int RijndaelPasswordLength
+		{
+			get => _rijndaelPasswordLength;
+			set { changeAlgorythmSettingValue(_NODENAME_RIJNDAEL_PASSWORD_LENGTH, value, ref _rijndaelPasswordLength, EncryptionAlgorythm.Rijndael == Algorythm); }
+		}
+
+		public int DESPasswordLength
+		{
+			get => _desPasswordLength;
+			set { changeAlgorythmSettingValue(_NODENAME_DES_PASSWORD_LENGTH, value, ref _desPasswordLength, EncryptionAlgorythm.DES == Algorythm); }
+		}
+
+		public int TripleDESPasswordLength
+		{
+			get => _tripleDesPasswordLength;
+			set { changeAlgorythmSettingValue(_NODENAME_TRIPLEDES_PASSWORD_LENGTH, value, ref _tripleDesPasswordLength, EncryptionAlgorythm.TripleDES == Algorythm); }
+		}
+
+		public int RC5PasswordLength
+		{
+			get => _rc5PasswordLength;
+			set { changeAlgorythmSettingValue(_NODENAME_RC5_PASSWORD_LENGTH, value, ref _rc5PasswordLength, EncryptionAlgorythm.RC5 == Algorythm); }
+		}
+
+		#endregion
+
+		#region Events
+
+		public event EventHandler AlgorythmChanged;
 
 		#endregion
 
@@ -214,6 +274,16 @@ namespace Telesyk.SecuredSource
 			}
 
 			return value;
+		}
+
+		private void changeAlgorythmSettingValue<T>(string nodeName, T value, ref T field, bool isCurrent)
+		{
+			writeSettingValue(nodeName, value);
+
+			field = value;
+
+			if (isCurrent && AlgorythmChanged != null)
+				AlgorythmChanged(this, EventArgs.Empty);
 		}
 
 		#endregion

@@ -133,6 +133,15 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Hide password.
+        /// </summary>
+        public static string HidePassword {
+            get {
+                return ResourceManager.GetString("HidePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Author: Denys Ivchenko\r\nPhone: +380969436980\r\n\Email: denys-ivchenko@hotmail.com.
         /// </summary>
         public static string InfoDialog {
@@ -169,11 +178,38 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Password.
+        /// </summary>
+        public static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Password Length.
         /// </summary>
         public static string PasswordLength {
             get {
                 return ResourceManager.GetString("PasswordLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на This password will be used as encryption key.
+        /// </summary>
+        public static string PasswordToolTip {
+            get {
+                return ResourceManager.GetString("PasswordToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на required.
+        /// </summary>
+        public static string RequiredQuantity {
+            get {
+                return ResourceManager.GetString("RequiredQuantity", resourceCulture);
             }
         }
         
@@ -187,11 +223,38 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на selected.
+        /// </summary>
+        public static string Selected {
+            get {
+                return ResourceManager.GetString("Selected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Show password.
+        /// </summary>
+        public static string ShowPassword {
+            get {
+                return ResourceManager.GetString("ShowPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Simple &amp; Fast.
         /// </summary>
         public static string SimpleAndFast {
             get {
                 return ResourceManager.GetString("SimpleAndFast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Symbols.
+        /// </summary>
+        public static string Symbols {
+            get {
+                return ResourceManager.GetString("Symbols", resourceCulture);
             }
         }
         

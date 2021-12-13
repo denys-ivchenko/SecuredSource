@@ -38,9 +38,10 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public methods
 
-		#endregion
-
-		#region Overridies
+		public void Test()
+		{
+			
+		}
 
 		#endregion
 
@@ -167,6 +168,8 @@ namespace Telesyk.SecuredSource.UI.Controls
 			else
 				_selectedFiles.Remove(file.FullName.ToUpper());
 
+			TextSelectedFileCount.Text = _selectedFiles.Count.ToString();
+
 			ensureDeleteButtonStyleAndState();
 			ensureAllSelectableButtonsState();
 		}
@@ -239,6 +242,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 			}
 
 			TextFileCount.Text = FilePack.FileCount.ToString();
+			TextSelectedFileCount.Text = _selectedFiles.Count.ToString();
 		}
 
 		#endregion

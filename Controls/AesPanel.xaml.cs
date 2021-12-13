@@ -30,10 +30,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#endregion
 
-		#region Overridies
-
-		#endregion
-
 		#region Private methods
 
 		private void init()

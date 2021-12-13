@@ -75,6 +75,12 @@
     <Compile Include="PackMainArea.xaml.cs">
       <DependentUpon>PackMainArea.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Password.xaml.cs">
+      <DependentUpon>Password.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Progress.xaml.cs">
+      <DependentUpon>Progress.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RC5Panel.xaml.cs">
       <DependentUpon>RC5Panel.xaml</DependentUpon>
     </Compile>
@@ -117,6 +123,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Password.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Progress.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RC5Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -154,6 +168,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Components\Crypton\Solution\Crypton\Crypton.csproj">
+      <Project>{f9610d8c-d083-463b-896f-d87cf1b31e6f}</Project>
+      <Name>Crypton</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{dd829222-ac76-41f9-9e5b-9af9a2bd1cf8}</Project>
       <Name>Core</Name>

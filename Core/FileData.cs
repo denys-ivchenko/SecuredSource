@@ -12,27 +12,10 @@ namespace Telesyk.SecuredSource
 
 		#region Constructors
 
-		//public FileData()
-		//{
-
-		//}
-
 		public FileData(string fullName)
 		{
 			initByName(fullName);
 		}
-
-		//public FileData(string name, int byteCount)
-		//	: this(name)
-		//{
-		//	ByteCount = byteCount;
-		//}
-
-		//public FileData(string name, int byteCount, int encryptedByteCount)
-		//	: this(name, byteCount)
-		//{
-		//	EncryptedByteCount = encryptedByteCount;
-		//}
 
 		#endregion
 

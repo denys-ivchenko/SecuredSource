@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Threading.Tasks;
 
 using Microsoft.Win32;
 
-using Telesyk.SecuredSource.Globalization;
+using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
@@ -16,6 +17,13 @@ namespace Telesyk.SecuredSource.UI.Controls
 		#region Private declarations
 
 		private Dictionary<EncryptionAlgorythm, UserControl> _panels = new Dictionary<EncryptionAlgorythm, UserControl>();
+
+		private int _totalPercentage = 0;
+
+		private IProgress<int> _progress = null;
+
+		private IProgress<int> _complette = null;
+
 
 		#endregion
 
@@ -48,20 +56,29 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
+			ControlPassword.PasswordChanged += ControlPassword_PasswordChanged;
+			
 			ColumnPanel.Width = new GridLength(ApplicationSettings.Current.PanelWidth);
+			TextDirectory.Text = ApplicationSettings.Current.Directory;
 
 			SelectAlgorythm.ItemsSource = Enum.GetNames(typeof(EncryptionAlgorythm));
 			SelectAlgorythm.SelectedValue = ApplicationSettings.Current.Algorythm.ToString();
+
+			checkEncryptButton();
+
+			_progress = new Progress<int>(percentage =>
+			{
+				ControlProgress.Value = percentage;
+			});
+
+			_complette = new Progress<int>(percentage =>
+			{
+				ControlProgress.Visibility = Visibility.Hidden;
+				ButtonEncrypt.IsEnabled = true;
+			});
 		}
 
-		#region Handlers
-
-		private void Splitter_DragCompleted(object sender, DragCompletedEventArgs e)
-		{
-			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth;
-		}
-
-		private void SelectAlgorythm_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void changeAlgorythm()
 		{
 			Enum.TryParse<EncryptionAlgorythm>(SelectAlgorythm.SelectedValue.ToString(), out EncryptionAlgorythm algorythm);
 			ApplicationSettings.Current.Algorythm = algorythm;
@@ -69,11 +86,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 			setPanelByAlgorythm();
 		}
 
-		#endregion
-
 		private void setPanelByAlgorythm()
 		{
-			ensurePanelControl();
+			checkPanelInList();
 
 			UserControl panel = _panels[ApplicationSettings.Current.Algorythm];
 
@@ -86,7 +101,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 			PanelLoad.Children.Add(panel);
 		}
 
-		private void ensurePanelControl()
+		private void checkPanelInList()
 		{
 			if (!_panels.ContainsKey(ApplicationSettings.Current.Algorythm))
 			{
@@ -115,6 +130,61 @@ namespace Telesyk.SecuredSource.UI.Controls
 			}
 		}
 
+		private void checkEncryptButton()
+		{
+			ButtonEncrypt.IsEnabled = ControlPassword.PasswordLength == ApplicationSettings.Current.PasswordLength;
+		}
+
+		private void saveSplitterWidth()
+		{
+			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth;
+		}
+
+		private async Task start()
+		{
+			EncryptionPack serialize = new EncryptionPack(@"D:\Проекты\Secured Source\Testing\data.$$", " Slava Ukraine! ", FilePack);
+			serialize.Completted += Serialize_Completted;
+			serialize.Progress += Serialize_Progress;
+
+			ControlProgress.Visibility = Visibility.Visible;
+			ButtonEncrypt.IsEnabled = false;
+
+			await Task.Run(() => { serialize.Process(); });
+
+			ButtonEncrypt.IsEnabled = true;
+		}
+
+		#region Handlers
+
+		private void SelectAlgorythm_SelectionChanged(object sender, SelectionChangedEventArgs e) => changeAlgorythm();
+
+		private void ControlPassword_PasswordChanged(object sender, EventArgs e) => checkEncryptButton();
+
+		private void Splitter_DragCompleted(object sender, DragCompletedEventArgs e) => saveSplitterWidth();
+
+		private void Button_MouseUp(object sender, MouseButtonEventArgs e)
+		{
+			var t = start();
+			var c = t.IsCanceled;
+		}
+
+		private void Serialize_Completted(object sender, EventArgs e)
+		{
+			_complette.Report(100);
+		}
+
+		private void Serialize_Progress(object sender, ProgressEventArgs e)
+		{
+			_progress.Report(e.Percentage);
+		}
+
 		#endregion
+
+		#endregion
+
+		private void Button_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			
+		}
 	}
 }

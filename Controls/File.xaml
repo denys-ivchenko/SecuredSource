@@ -6,10 +6,7 @@
              xmlns:local="clr-namespace:Telesyk.SecuredSource.UI.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-	<UserControl.Resources>
-		
-	</UserControl.Resources>
-	<StackPanel x:Name="Container" MouseMove="Container_MouseMove" MouseLeave="Container_MouseLeave" MouseUp="Container_MouseUp">
+	<StackPanel x:Name="Container" MouseMove="Container_MouseMove" MouseLeave="Container_MouseLeave" MouseLeftButtonUp="Container_MouseUp">
 		<TextBlock x:Name="Text" />
 	</StackPanel>
 </UserControl>

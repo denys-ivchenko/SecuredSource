@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace SecuredSource
+namespace Telesyk.SecuredSource
 {
 	public partial class App : Application
 	{

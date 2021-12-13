@@ -9,26 +9,26 @@
 	d:DesignHeight="450" d:DesignWidth="800">
 	<StackPanel x:Name="PanelMainAreaLoad" Style="{StaticResource FilesArea}">
 		<TextBlock Style="{StaticResource TextCaption}"><Run Text="{x:Static res:Strings.Files}" />:</TextBlock>
-		<Border BorderBrush="#718ca0" BorderThickness="1">
+		<Border Style="{StaticResource FilesAreaBorder}">
 			<ScrollViewer Height="140">
 				<StackPanel x:Name="PanelFiles" />
 			</ScrollViewer>
 		</Border>
-		<Grid>
+		<Grid Style="{StaticResource Test}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="50"/>
 				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="90" />
+				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 			<StackPanel Grid.Column="0" Orientation="Horizontal" Style="{StaticResource FileButtons}">
-				<Image x:Name="ButtonFileAdd" ToolTip="{x:Static res:Strings.AddFiles}" Style="{StaticResource FileButton}" MouseDown="ButtonFileAdd_MouseDown" MouseUp="ButtonFileAdd_MouseUp" MouseLeave="ButtonFileAdd_MouseLeave" />
-				<Image x:Name="ButtonFileDelete" IsEnabled="False" ToolTip="{x:Static res:Strings.DeleteSelected}" Style="{StaticResource FileButtonDeleteDisabled}" MouseDown="ButtonFileDelete_MouseDown" MouseUp="ButtonFileDelete_MouseUp" MouseLeave="ButtonFileDelete_MouseLeave" />
+				<Image x:Name="ButtonFileAdd" ToolTip="{x:Static res:Strings.AddFiles}" Style="{StaticResource FileButton}" MouseLeftButtonDown="ButtonFileAdd_MouseDown" MouseLeftButtonUp="ButtonFileAdd_MouseUp" MouseLeave="ButtonFileAdd_MouseLeave" />
+				<Image x:Name="ButtonFileDelete" IsEnabled="False" ToolTip="{x:Static res:Strings.DeleteSelected}" Style="{StaticResource FileButtonDeleteDisabled}" MouseLeftButtonDown="ButtonFileDelete_MouseDown" MouseLeftButtonUp="ButtonFileDelete_MouseUp" MouseLeave="ButtonFileDelete_MouseLeave" />
 			</StackPanel>
 			<StackPanel Grid.Column="1" Orientation="Horizontal">
-				<Image x:Name="ButtonFileSelectAll" IsEnabled="False" ToolTip="{x:Static res:Strings.SelectAll}" Style="{StaticResource FileButtonSelectAllDisabled}" MouseDown="ButtonFileSelectAll_MouseDown" MouseUp="ButtonFileSelectAll_MouseUp" MouseLeave="ButtonFileSelectAll_MouseLeave" />
-				<Image x:Name="ButtonFileDeselectAll" IsEnabled="False" ToolTip="{x:Static res:Strings.DeselectAll}" Style="{StaticResource FileButtonDeselectAllDisabled}" MouseDown="ButtonFileDeselectAll_MouseDown" MouseUp="ButtonFileDeselectAll_MouseUp" MouseLeave="ButtonFileDeselectAll_MouseLeave" />
+				<Image x:Name="ButtonFileSelectAll" IsEnabled="False" ToolTip="{x:Static res:Strings.SelectAll}" Style="{StaticResource FileButtonSelectAllDisabled}" MouseLeftButtonDown="ButtonFileSelectAll_MouseDown" MouseLeftButtonUp="ButtonFileSelectAll_MouseUp" MouseLeave="ButtonFileSelectAll_MouseLeave" />
+				<Image x:Name="ButtonFileDeselectAll" IsEnabled="False" ToolTip="{x:Static res:Strings.DeselectAll}" Style="{StaticResource FileButtonDeselectAllDisabled}" MouseLeftButtonDown="ButtonFileDeselectAll_MouseDown" MouseLeftButtonUp="ButtonFileDeselectAll_MouseUp" MouseLeave="ButtonFileDeselectAll_MouseLeave" />
 			</StackPanel>
-			<TextBlock Grid.Column="2" Style="{StaticResource FileCountContainer}"><Run Text="{x:Static res:Strings.OfFiles}" />: <Run x:Name="TextFileCount" Text="342323" Style="{StaticResource FileCount}" /></TextBlock>
+			<TextBlock Grid.Column="2" Style="{StaticResource FileCountContainer}"><Run Text="{x:Static res:Strings.OfFiles}" />: <Run x:Name="TextFileCount" Text="0" Style="{StaticResource FileCount}" />, <Run Text="{x:Static res:Strings.Selected}" />: <Run x:Name="TextSelectedFileCount" Text="0" Style="{StaticResource FileCount}" /></TextBlock>
 		</Grid>
 	</StackPanel>
 </UserControl>

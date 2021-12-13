@@ -28,9 +28,14 @@
 			<Canvas Style="{StaticResource AreaBeginer}" />
 			<StackPanel Style="{StaticResource MainArea}">
 				<local:FilesControl x:Name="ControlFiles" />
-				<StackPanel Orientation="Horizontal" Style="{StaticResource ButtonsArea}">
-					<Button Content="{x:Static res:Strings.Decrypt}" />
-					<Button Content="{x:Static res:Strings.Encrypt}" />
+				<local:PasswordControl x:Name="ControlPassword" />
+				<local:ProgressControl x:Name="ControlProgress" Visibility="Hidden" />
+				<StackPanel Orientation="Horizontal">
+					<TextBox x:Name="TextDirectory" />
+					<Button Content="Огляд…" PreviewMouseLeftButtonUp="Button_MouseLeftButtonUp" />
+				</StackPanel>
+				<StackPanel Style="{StaticResource ButtonsArea}">
+					<Button x:Name="ButtonEncrypt" Content="{x:Static res:Strings.Encrypt}" PreviewMouseLeftButtonUp="Button_MouseUp" />
 				</StackPanel>
 			</StackPanel>
 		</StackPanel>
