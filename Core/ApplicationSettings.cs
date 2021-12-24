@@ -5,6 +5,8 @@ using System.Security.AccessControl;
 using System.IO;
 using System.Xml;
 
+using Telesyk.Cryptography;
+
 namespace Telesyk.SecuredSource
 {
 	public sealed class ApplicationSettings
@@ -24,6 +26,7 @@ namespace Telesyk.SecuredSource
 		private const string _NODENAME_MODE = "mode";
 		private const string _NODENAME_PANEL_WIDTH = "panel-width";
 		private const string _NODENAME_DIRECTORY = "directory";
+		private const string _NODENAME_FILE_NAME = "file-name";
 		private const string _NODENAME_ALGORYTHM = "algorythm";
 		private const string _NODENAME_AES_PASSWORD_LENGTH = "aes-password-length";
 		private const string _NODENAME_RIJNDAEL_PASSWORD_LENGTH = "rijndael-password-length";
@@ -35,17 +38,18 @@ namespace Telesyk.SecuredSource
 
 		private ApplicationMode _mode = ApplicationMode.SimpleAndFast;
 		private int _windowWidth = 600;
-		private int _windowHeight = 400;
+		private int _windowHeight = 420;
 		private int _windowTop = 200;
 		private int _windowLeft = 400;
 		private int _panelWidth = 160;
 		private string _directory = null;
+		private string _fileName = null;
 		private int _aesPasswordLength = 16;
 		private int _rijndaelPasswordLength = 12;
 		private int _desPasswordLength = 5;
 		private int _tripleDesPasswordLength = 8;
 		private int _rc5PasswordLength = 11;
-		private EncryptionAlgorythm _algorythm = EncryptionAlgorythm.RC5;
+		private SymmetricAlgorithmName _algorythm = SymmetricAlgorithmName.RC2;
 
 		#endregion
 
@@ -76,15 +80,15 @@ namespace Telesyk.SecuredSource
 			{
 				switch(Algorythm)
 				{
-					case EncryptionAlgorythm.Aes:
+					case SymmetricAlgorithmName.Aes:
 						return AesPasswordLength;
-					case EncryptionAlgorythm.Rijndael:
+					case SymmetricAlgorithmName.Rijndael:
 						return RijndaelPasswordLength;
-					case EncryptionAlgorythm.DES:
+					case SymmetricAlgorithmName.DES:
 						return DESPasswordLength;
-					case EncryptionAlgorythm.TripleDES:
+					case SymmetricAlgorithmName.TripleDES:
 						return TripleDESPasswordLength;
-					case EncryptionAlgorythm.RC5:
+					case SymmetricAlgorithmName.RC2:
 						return RC5PasswordLength;
 				}
 
@@ -113,13 +117,13 @@ namespace Telesyk.SecuredSource
 		public int WindowTop
 		{
 			get => _windowTop;
-			set { _windowTop = writeSettingValue(_NODENAME_WINDOW_TOP, value); }
+			set { _windowTop = writeSettingValue(_NODENAME_WINDOW_TOP, value < 0 ? WindowTop : value); }
 		}
 
 		public int WindowLeft
 		{
 			get => _windowLeft;
-			set { _windowLeft = writeSettingValue(_NODENAME_WINDOW_LEFT, value); }
+			set { _windowLeft = writeSettingValue(_NODENAME_WINDOW_LEFT, value < 0 ? WindowLeft : value); }
 		}
 
 		public int PanelWidth
@@ -134,7 +138,13 @@ namespace Telesyk.SecuredSource
 			set { _directory = writeSettingValue(_NODENAME_DIRECTORY, value); }
 		}
 
-		public EncryptionAlgorythm Algorythm
+		public string FileName
+		{
+			get => _fileName;
+			set { _fileName = writeSettingValue(_NODENAME_FILE_NAME, value); }
+		}
+
+		public SymmetricAlgorithmName Algorythm
 		{
 			get => _algorythm;
 			set { changeAlgorythmSettingValue(_NODENAME_ALGORYTHM, value, ref _algorythm, true); }
@@ -143,31 +153,31 @@ namespace Telesyk.SecuredSource
 		public int AesPasswordLength
 		{
 			get => _aesPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value, ref _aesPasswordLength, EncryptionAlgorythm.Aes == Algorythm); }
+			set { changeAlgorythmSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value, ref _aesPasswordLength, SymmetricAlgorithmName.Aes == Algorythm); }
 		}
 
 		public int RijndaelPasswordLength
 		{
 			get => _rijndaelPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_RIJNDAEL_PASSWORD_LENGTH, value, ref _rijndaelPasswordLength, EncryptionAlgorythm.Rijndael == Algorythm); }
+			set { changeAlgorythmSettingValue(_NODENAME_RIJNDAEL_PASSWORD_LENGTH, value, ref _rijndaelPasswordLength, SymmetricAlgorithmName.Rijndael == Algorythm); }
 		}
 
 		public int DESPasswordLength
 		{
 			get => _desPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_DES_PASSWORD_LENGTH, value, ref _desPasswordLength, EncryptionAlgorythm.DES == Algorythm); }
+			set { changeAlgorythmSettingValue(_NODENAME_DES_PASSWORD_LENGTH, value, ref _desPasswordLength, SymmetricAlgorithmName.DES == Algorythm); }
 		}
 
 		public int TripleDESPasswordLength
 		{
 			get => _tripleDesPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_TRIPLEDES_PASSWORD_LENGTH, value, ref _tripleDesPasswordLength, EncryptionAlgorythm.TripleDES == Algorythm); }
+			set { changeAlgorythmSettingValue(_NODENAME_TRIPLEDES_PASSWORD_LENGTH, value, ref _tripleDesPasswordLength, SymmetricAlgorithmName.TripleDES == Algorythm); }
 		}
 
 		public int RC5PasswordLength
 		{
 			get => _rc5PasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_RC5_PASSWORD_LENGTH, value, ref _rc5PasswordLength, EncryptionAlgorythm.RC5 == Algorythm); }
+			set { changeAlgorythmSettingValue(_NODENAME_RC5_PASSWORD_LENGTH, value, ref _rc5PasswordLength, SymmetricAlgorithmName.RC2 == Algorythm); }
 		}
 
 		#endregion
@@ -202,8 +212,11 @@ namespace Telesyk.SecuredSource
 			readIntegerSetting(_NODENAME_WINDOW_LEFT, ref _windowLeft);
 			readIntegerSetting(_NODENAME_PANEL_WIDTH, ref _panelWidth);
 			readStringSetting(_NODENAME_DIRECTORY, ref _directory);
-			readEnumSetting<EncryptionAlgorythm>(_NODENAME_ALGORYTHM, ref _algorythm);
+			readStringSetting(_NODENAME_FILE_NAME, ref _fileName);
+			readEnumSetting<SymmetricAlgorithmName>(_NODENAME_ALGORYTHM, ref _algorythm);
 			readIntegerSetting(_NODENAME_AES_PASSWORD_LENGTH, ref _aesPasswordLength);
+
+			_directory = !string.IsNullOrEmpty(_directory) ? _directory : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 		}
 
 		#endregion
@@ -212,13 +225,17 @@ namespace Telesyk.SecuredSource
 
 		private XmlNode getSettingNode(string nodeName)
 		{
-			XmlNode node = SettingsXml.LastChild.SelectSingleNode(nodeName);
+			return SettingsXml.LastChild.SelectSingleNode(nodeName);
+		}
 
-			if (node == null)
-			{
-				reCreateSettingsXml();
-				node = SettingsXml.LastChild.SelectSingleNode(nodeName);
-			}
+		private XmlNode createSettingNode(string nodeName, ref string value)
+		{
+			XmlNode node = SettingsXml.CreateElement(nodeName);
+			SettingsXml.LastChild.AppendChild(node);
+
+			node.InnerText = value;
+
+			SettingsXml.Save(XmlFilePath);
 
 			return node;
 		}
@@ -227,7 +244,10 @@ namespace Telesyk.SecuredSource
 
 		private void readStringSetting(string nodeName, ref string value, bool skipWriteIfEmpty)
 		{
-			var node = getSettingNode("last/" + nodeName);
+			var node = getSettingNode(nodeName);
+
+			if (node == null)
+				node = createSettingNode(nodeName, ref value);
 
 			if (!skipWriteIfEmpty && string.IsNullOrWhiteSpace(node.InnerText) && !string.IsNullOrWhiteSpace(value))
 				writeSettingValue<string>(nodeName, value);
@@ -263,17 +283,19 @@ namespace Telesyk.SecuredSource
 		private T writeSettingValue<T>(string nodeName, T value, bool withoutSaving)
 		{
 			var text = value != null ? value.ToString() : string.Empty;
-			var node = getSettingNode("last/" + nodeName);
+			var node = getSettingNode(nodeName);
 
-			if (node.InnerText != text)
+			if (node != null && node.InnerText != text)
 			{
 				node.InnerText = value.ToString();
 
 				if (!withoutSaving)
 					SettingsXml.Save(XmlFilePath);
 			}
+			else if (node == null)
+				createSettingNode(nodeName, ref text);
 
-			return value;
+				return value;
 		}
 
 		private void changeAlgorythmSettingValue<T>(string nodeName, T value, ref T field, bool isCurrent)
@@ -293,7 +315,7 @@ namespace Telesyk.SecuredSource
 		private void createSettingsXml()
 		{
 			SettingsXml = new XmlDocument();
-			SettingsXml.LoadXml(Properties.Resources.Settings);
+			SettingsXml.AppendChild(SettingsXml.CreateElement("settings"));
 
 			writeSettingValue(_NODENAME_MODE, Mode, true);
 			writeSettingValue(_NODENAME_WINDOW_WIDTH, WindowWidth, true);
@@ -302,6 +324,7 @@ namespace Telesyk.SecuredSource
 			writeSettingValue(_NODENAME_WINDOW_LEFT, WindowLeft, true);
 			writeSettingValue(_NODENAME_PANEL_WIDTH, PanelWidth, true);
 			writeSettingValue(_NODENAME_DIRECTORY, Directory, true);
+			writeSettingValue(_NODENAME_FILE_NAME, FileName, true);
 			writeSettingValue(_NODENAME_ALGORYTHM, Algorythm, true);
 			writeSettingValue(_NODENAME_AES_PASSWORD_LENGTH, AesPasswordLength, true);
 

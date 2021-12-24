@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Telesyk.Cryptography;
 
@@ -11,32 +14,33 @@ namespace Telesyk.SecuredSource
 	{
 		#region Private declarations
 
+		private CancellationTokenSource _cancel;
 		private int _totalByteComplitted;
+		private int _lastPercentage;
 
 		#endregion
 
 		#region Constructors
 
-		private EncryptionPack(string filePath, string password)
+		private EncryptionPack(string filePath, string password, EncryptedPackMode mode)
 		{
 			FilePath = filePath;
 			Password = password;
+			Mode = mode;
 
 			init();
 		}
 
 		public EncryptionPack(string filePath, string password, PackData filePackData)
-			: this(filePath, password)
+			: this(filePath, password, EncryptedPackMode.Serialize)
 		{
 			FilePack = filePackData;
-			Mode = EncryptedPackMode.Serialize;
 		}
 
 		public EncryptionPack(string filePath, string password, string outputPath)
-			: this(filePath, password)
+			: this(filePath, password, EncryptedPackMode.Deserialize)
 		{
 			OutputPath = outputPath;
-			Mode = EncryptedPackMode.Deserialize;
 		}
 
 		#endregion
@@ -57,7 +61,7 @@ namespace Telesyk.SecuredSource
 
 		public int TotalBytes { get; private set; }
 
-		public int ByteComplitted
+		public int BytesComplitted
 		{
 			get => _totalByteComplitted + CurrentByteComplitted;
 			private set
@@ -69,11 +73,15 @@ namespace Telesyk.SecuredSource
 
 		public int CurrentByteComplitted { get; private set; }
 
+		public bool IsCanceled { get; private set; }
+
 		#endregion
 
 		#region Public methods
 
 		public void Process() => process();
+
+		public void Cancel() => cancel();
 
 		#endregion
 
@@ -83,13 +91,17 @@ namespace Telesyk.SecuredSource
 
 		public event EventHandler Completted;
 
+		public event EventHandler Canceled;
+
+		public event EventHandler Finished;
+
 		#endregion
 
 		#region Interface implementations
 
 		//public void Dispose()
 		//{
-			
+
 		//}
 
 		#endregion
@@ -104,35 +116,65 @@ namespace Telesyk.SecuredSource
 		{
 			PasswordBytes = Encoding.UTF8.GetBytes(Password);
 
-			using (FileStream stream = new FileStream(FilePath, FileMode.Open))
-				TotalBytes = (int)stream.Length;
+			if (Mode == EncryptedPackMode.Deserialize)
+				using (FileStream stream = new FileStream(FilePath, FileMode.Open))
+					TotalBytes = (int)stream.Length;
 
-			Crypton.Instance.Progress += Instance_Progress;
+			//Crypton.Instance.Progress += Crypton_Progress;
 		}
 
-		private void Instance_Progress(object sender, ProgressEventArgs args)
+		private async void process()
 		{
-			if (Progress != null)
-			{
-				CurrentByteComplitted = args.ByteComplitted;
+			_cancel = new CancellationTokenSource();
+			_lastPercentage = 0;
 
-				Progress(this, new ProgressEventArgs((int)((ByteComplitted / TotalBytes) * 100), ByteComplitted));
-			}
+			await processAsync();
 		}
 
-		private void process()
+		private async Task processAsync()
 		{
-			if (Mode == EncryptedPackMode.Serialize)
-				serialize();
-			else
-				deserialize();
+			Debug.WriteLine("process()");
+			
+			Action action = () => serialize();
+			
+			if (Mode == EncryptedPackMode.Deserialize)
+				action = () => deserialize();
+
+			await Task.Run(action, _cancel.Token);
 
 			if (Completted != null)
 				Completted(this, EventArgs.Empty);
+
+			if (Finished != null)
+				Finished(this, EventArgs.Empty);
+
+			Debug.WriteLine("process.");
 		}
 
-		private void serialize()
+		private void cancel()
 		{
+			_cancel.Cancel();
+
+			if (Canceled != null)
+				Canceled(this, EventArgs.Empty);
+
+			if (Finished != null)
+				Finished(this, EventArgs.Empty);
+		}
+
+		private void ensureCanceling()
+		{
+			//Debug.WriteLine("ensureCanceling()");
+
+			_cancel.Token.ThrowIfCancellationRequested();
+
+			//Debug.WriteLine("ensureCanceling.");
+		}
+
+		private async Task serialize()
+		{
+			Debug.WriteLine("serialize()");
+
 			BinaryFormatter formatter = new BinaryFormatter();
 
 			var packBytes = PackData.Serialize(FilePack);
@@ -140,7 +182,7 @@ namespace Telesyk.SecuredSource
 			TotalBytes = 4 + packBytes.Length;
 
 			foreach (var file in FilePack)
-				TotalBytes += file.ByteCount * 6;
+				TotalBytes += file.ByteCount * 5;
 
 			using (FileStream file = new FileStream(FilePath, FileMode.Create))
 			{
@@ -218,6 +260,8 @@ namespace Telesyk.SecuredSource
 					progress(fileData.ByteCount, true);
 				}
 			}
+
+			Debug.WriteLine("serialize.");
 		}
 
 		private void deserialize()
@@ -251,14 +295,30 @@ namespace Telesyk.SecuredSource
 		private void progress(int byteCount, bool isTotal)
 		{
 			if (isTotal)
-				ByteComplitted = ByteComplitted + byteCount;
+				BytesComplitted = BytesComplitted + byteCount;
 			else
 				CurrentByteComplitted = byteCount;
 
-			var percentage = (int)((ByteComplitted / (decimal)TotalBytes) * 100);
+			var percentage = (int)((BytesComplitted / (decimal)TotalBytes) * 100);
 
-			if (Progress != null)
+			if (Progress != null && percentage > _lastPercentage)
+			{
+				_lastPercentage = percentage;
+
 				Progress(this, new ProgressEventArgs(percentage, 0));
+			}
+
+			ensureCanceling();
+		}
+
+		private void cryptonProgress(int bytesComplitted)
+		{
+			if (Progress != null)
+			{
+				CurrentByteComplitted = bytesComplitted;
+
+				Progress(this, new ProgressEventArgs((int)((BytesComplitted / TotalBytes) * 100), BytesComplitted));
+			}
 		}
 
 		private byte[] encryptFile(byte[] fileBytes)
@@ -276,6 +336,12 @@ namespace Telesyk.SecuredSource
 
 			return Crypton.Instance.DecryptByAes(fileBytes);
 		}
+
+		#region Handlers
+
+		private void Crypton_Progress(object sender, ProgressEventArgs args) => cryptonProgress(args.BytesComplitted);
+
+		#endregion
 
 		#endregion
 

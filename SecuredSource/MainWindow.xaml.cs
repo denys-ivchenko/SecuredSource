@@ -88,8 +88,8 @@ namespace Telesyk.SecuredSource.UI
 					break;
 			}
 
-			MainAreaPanel.Children.Clear();
-			MainAreaPanel.Children.Add(controlArea);
+			ControlMainArea.Children.Clear();
+			ControlMainArea.Children.Add(controlArea);
 		}
 
 		#region Handlers

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+
+using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource
 {
@@ -46,7 +49,7 @@ namespace Telesyk.SecuredSource
 			}
 		}
 
-		public EncryptionAlgorythm Algorythm { get; internal set; }
+		public SymmetricAlgorithmName Algorythm { get; internal set; }
 
 		public int PasswordLength { get; internal set; }
 
@@ -217,14 +220,19 @@ namespace Telesyk.SecuredSource
 			using (var stream = new MemoryStream())
 			{
 				formatter.Serialize(stream, pack);
+				
+				var base64 = Convert.ToBase64String(stream.ToArray());
 
-				return stream.ToArray();
+				return Encoding.UTF8.GetBytes(base64);
 			}
 		}
 
 		private static PackData deserialize(byte[] bytes)
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
+
+			var base64 = Encoding.UTF8.GetString(bytes);
+			bytes = Convert.FromBase64String(base64);
 
 			using (var stream = new MemoryStream(bytes))
 				return (PackData)formatter.Deserialize(stream);

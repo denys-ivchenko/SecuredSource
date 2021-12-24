@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
@@ -49,17 +42,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#endregion
 
-		#region Public methods
-
-		#endregion
-
 		#region Events
 
 		public event EventHandler PasswordChanged;
-
-		#endregion
-
-		#region Overrided methods
 
 		#endregion
 
@@ -120,15 +105,15 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 			if (IsPasswordVisible)
 			{
-				ImageVisibility.Style = (Style)FindResource("VisiblePasswordImage");
-				BorderText.Visibility = TextValue.Visibility = Visibility.Visible;
-				BorderPassword.Visibility = PasswordValue.Visibility = Visibility.Collapsed;
+				ImageVisibility.Style = (Style)FindResource("UnvisiblePasswordImage");
+				TextValue.Visibility = Visibility.Visible;
+				PasswordValue.Visibility = Visibility.Collapsed;
 			}
 			else
 			{
 				ImageVisibility.Style = (Style)FindResource("UnvisiblePasswordImage"); ;
-				BorderText.Visibility = TextValue.Visibility = Visibility.Collapsed;
-				BorderPassword.Visibility = PasswordValue.Visibility = Visibility.Visible;
+				TextValue.Visibility = Visibility.Collapsed;
+				PasswordValue.Visibility = Visibility.Visible;
 			}
 		}
 

@@ -10,18 +10,6 @@
 	</UserControl.Resources>
 	<StackPanel>
 		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
-		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
-		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
-		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
-		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
-		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
-		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Rijndael panel.</TextBlock>
-		<TextBox Style="{StaticResource PanelFieldControl}"></TextBox>
+		<TextBox></TextBox>
 	</StackPanel>
 </UserControl>

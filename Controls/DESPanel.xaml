@@ -10,14 +10,10 @@
 	</UserControl.Resources>
 	<StackPanel>
 		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 1:</TextBlock>
-		<RadioButton Style="{StaticResource PanelFieldControl}">Value 1</RadioButton>
+		<RadioButton>Value 1</RadioButton>
 		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 2:</TextBlock>
-		<RadioButton Style="{StaticResource PanelFieldControl}">Value 2</RadioButton>
+		<RadioButton>Value 2</RadioButton>
 		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 3:</TextBlock>
-		<RadioButton Style="{StaticResource PanelFieldControl}">Value 3</RadioButton>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 4:</TextBlock>
-		<RadioButton Style="{StaticResource PanelFieldControl}">Value 4</RadioButton>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 5:</TextBlock>
-		<RadioButton Style="{StaticResource PanelFieldControl}">Value 5</RadioButton>
+		<RadioButton>Value 3</RadioButton>
 	</StackPanel>
 </UserControl>

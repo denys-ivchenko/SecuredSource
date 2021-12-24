@@ -88,6 +88,15 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Browse....
+        /// </summary>
+        public static string Browse {
+            get {
+                return ResourceManager.GetString("Browse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Decrypt.
         /// </summary>
         public static string Decrypt {
@@ -115,11 +124,20 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Encrypt.
+        ///   Ищет локализованную строку, похожую на Directory.
         /// </summary>
-        public static string Encrypt {
+        public static string Directory {
             get {
-                return ResourceManager.GetString("Encrypt", resourceCulture);
+                return ResourceManager.GetString("Directory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File name.
+        /// </summary>
+        public static string FileName {
+            get {
+                return ResourceManager.GetString("FileName", resourceCulture);
             }
         }
         
@@ -232,6 +250,15 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Please select directory to save encrypted package..
+        /// </summary>
+        public static string SelectSavingDirectory {
+            get {
+                return ResourceManager.GetString("SelectSavingDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Show password.
         /// </summary>
         public static string ShowPassword {
@@ -246,6 +273,24 @@ namespace Telesyk.SecuredSource.Globalization {
         public static string SimpleAndFast {
             get {
                 return ResourceManager.GetString("SimpleAndFast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Start.
+        /// </summary>
+        public static string Start {
+            get {
+                return ResourceManager.GetString("Start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Stop.
+        /// </summary>
+        public static string Stop {
+            get {
+                return ResourceManager.GetString("Stop", resourceCulture);
             }
         }
         

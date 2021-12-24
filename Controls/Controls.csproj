@@ -43,6 +43,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -57,6 +58,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Panel.xaml.cs">
+      <DependentUpon>Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DESPanel.xaml.cs">
       <DependentUpon>DESPanel.xaml</DependentUpon>
     </Compile>
@@ -84,6 +88,9 @@
     <Compile Include="RC5Panel.xaml.cs">
       <DependentUpon>RC5Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SelectDirectory.xaml.cs">
+      <DependentUpon>SelectDirectory.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TripleDESPanel.xaml.cs">
       <DependentUpon>TripleDESPanel.xaml</DependentUpon>
     </Compile>
@@ -99,6 +106,10 @@
     <Compile Include="SimpleAndFast.xaml.cs">
       <DependentUpon>SimpleAndFast.xaml</DependentUpon>
     </Compile>
+    <Page Include="Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DESPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -132,6 +143,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RC5Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SelectDirectory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

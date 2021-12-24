@@ -1,9 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Win32;
@@ -16,13 +19,11 @@ namespace Telesyk.SecuredSource.UI.Controls
 	{
 		#region Private declarations
 
-		private Dictionary<EncryptionAlgorythm, UserControl> _panels = new Dictionary<EncryptionAlgorythm, UserControl>();
-
-		private int _totalPercentage = 0;
-
 		private IProgress<int> _progress = null;
 
-		private IProgress<int> _complette = null;
+		private IProgress<int> _finish = null;
+
+		private EncryptionPack _encryptor;
 
 
 		#endregion
@@ -56,83 +57,41 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			ControlPassword.PasswordChanged += ControlPassword_PasswordChanged;
-			
+			ControlPanel.ControlPassword.PasswordChanged += ControlPassword_PasswordChanged;
+			ControlFiles.FilesChanged += ControlFiles_FilesChanged;
+
 			ColumnPanel.Width = new GridLength(ApplicationSettings.Current.PanelWidth);
-			TextDirectory.Text = ApplicationSettings.Current.Directory;
 
-			SelectAlgorythm.ItemsSource = Enum.GetNames(typeof(EncryptionAlgorythm));
-			SelectAlgorythm.SelectedValue = ApplicationSettings.Current.Algorythm.ToString();
+			checkStartButton();
 
-			checkEncryptButton();
+			var lastPercentage = 0;
 
 			_progress = new Progress<int>(percentage =>
 			{
-				ControlProgress.Value = percentage;
-			});
-
-			_complette = new Progress<int>(percentage =>
-			{
-				ControlProgress.Visibility = Visibility.Hidden;
-				ButtonEncrypt.IsEnabled = true;
-			});
-		}
-
-		private void changeAlgorythm()
-		{
-			Enum.TryParse<EncryptionAlgorythm>(SelectAlgorythm.SelectedValue.ToString(), out EncryptionAlgorythm algorythm);
-			ApplicationSettings.Current.Algorythm = algorythm;
-
-			setPanelByAlgorythm();
-		}
-
-		private void setPanelByAlgorythm()
-		{
-			checkPanelInList();
-
-			UserControl panel = _panels[ApplicationSettings.Current.Algorythm];
-
-			if (PanelLoad.Children.Count > 0)
-				if (PanelLoad.Children[0] == panel)
-					return;
-				else
-					PanelLoad.Children.Clear();
-
-			PanelLoad.Children.Add(panel);
-		}
-
-		private void checkPanelInList()
-		{
-			if (!_panels.ContainsKey(ApplicationSettings.Current.Algorythm))
-			{
-				UserControl panel = null;
-
-				switch (ApplicationSettings.Current.Algorythm)
+				if (percentage > lastPercentage)
 				{
-					case (EncryptionAlgorythm.Aes):
-						panel = new AesPanelControl();
-						break;
-					case (EncryptionAlgorythm.Rijndael):
-						panel = new RijndaelPanelControl();
-						break;
-					case (EncryptionAlgorythm.DES):
-						panel = new DESPanelControl();
-						break;
-					case (EncryptionAlgorythm.TripleDES):
-						panel = new TripleDESPanelControl();
-						break;
-					case (EncryptionAlgorythm.RC5):
-						panel = new RC5PanelControl();
-						break;
-				}
+					if (percentage == 100)
+						percentage = 100;
+					
+					lastPercentage = percentage;
 
-				_panels.Add(ApplicationSettings.Current.Algorythm, panel);
-			}
+					Debug.WriteLine($"percentage: {ControlProgress.Value = percentage}");
+				}
+			});
+
+			_finish = new Progress<int>(percentage =>
+			{
+				lastPercentage = 0;
+
+				ControlProgress.Value = percentage;
+				ControlProgress.Visibility = Visibility.Hidden;
+				ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = true);
+			});
 		}
 
-		private void checkEncryptButton()
+		private void checkStartButton()
 		{
-			ButtonEncrypt.IsEnabled = ControlPassword.PasswordLength == ApplicationSettings.Current.PasswordLength;
+			ButtonStart.IsEnabled = ControlPanel.ControlPassword.PasswordLength == ApplicationSettings.Current.PasswordLength && ControlFiles.FilePack.FileCount > 0;
 		}
 
 		private void saveSplitterWidth()
@@ -140,51 +99,57 @@ namespace Telesyk.SecuredSource.UI.Controls
 			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth;
 		}
 
-		private async Task start()
+		private void start()
 		{
-			EncryptionPack serialize = new EncryptionPack(@"D:\Проекты\Secured Source\Testing\data.$$", " Slava Ukraine! ", FilePack);
-			serialize.Completted += Serialize_Completted;
+			startAsync();
+		}
+
+		private void startAsync()
+		{
+			Debug.WriteLine("UI.startAsync()");
+
+			EncryptionPack serialize = new EncryptionPack(Path.Combine(ApplicationSettings.Current.Directory, $"{ApplicationSettings.Current.FileName}.$$"), ControlPanel.Password, FilePack);
+			serialize.Finished += Serialize_Finished;
 			serialize.Progress += Serialize_Progress;
 
+			ControlProgress.Value = 0;
 			ControlProgress.Visibility = Visibility.Visible;
-			ButtonEncrypt.IsEnabled = false;
+			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = false);
 
-			await Task.Run(() => { serialize.Process(); });
+			_encryptor = serialize;
 
-			ButtonEncrypt.IsEnabled = true;
+			serialize.Process();
+
+			Debug.WriteLine("UI.startAsync.");
+		}
+
+		private void stop()
+		{
+			//try { _encryptor.Cancel(); }
+			//catch { }
+			Debug.WriteLine("UI.stop()");
+			_encryptor.Cancel();
+			Debug.WriteLine("UI.stop.");
 		}
 
 		#region Handlers
 
-		private void SelectAlgorythm_SelectionChanged(object sender, SelectionChangedEventArgs e) => changeAlgorythm();
+		private void ControlPassword_PasswordChanged(object sender, EventArgs e) => checkStartButton();
 
-		private void ControlPassword_PasswordChanged(object sender, EventArgs e) => checkEncryptButton();
+		private void ControlFiles_FilesChanged(object sender, EventArgs e) => checkStartButton();
 
 		private void Splitter_DragCompleted(object sender, DragCompletedEventArgs e) => saveSplitterWidth();
 
-		private void Button_MouseUp(object sender, MouseButtonEventArgs e)
-		{
-			var t = start();
-			var c = t.IsCanceled;
-		}
+		private void Serialize_Finished(object sender, EventArgs e) => _finish.Report(0);
 
-		private void Serialize_Completted(object sender, EventArgs e)
-		{
-			_complette.Report(100);
-		}
+		private void Serialize_Progress(object sender, ProgressEventArgs e) => _progress.Report(e.Percentage);
 
-		private void Serialize_Progress(object sender, ProgressEventArgs e)
-		{
-			_progress.Report(e.Percentage);
-		}
+		private void ButtonStop_Click(object sender, RoutedEventArgs e) => stop();
+
+		private void ButtonStart_Click(object sender, RoutedEventArgs e) => start();
 
 		#endregion
 
 		#endregion
-
-		private void Button_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			
-		}
 	}
 }

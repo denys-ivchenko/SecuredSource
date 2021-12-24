@@ -16,7 +16,7 @@ using System.Windows;
 [assembly: AssemblyTrademark("Telesyk Cryptographic Software")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.0.1.*")]
-[assembly: AssemblyFileVersion("1.0.1.21")]
+[assembly: AssemblyFileVersion("1.0.1.22")]
 
 [assembly: ComVisible(false)]
 [assembly: ThemeInfo(ResourceDictionaryLocation.None, ResourceDictionaryLocation.SourceAssembly)]

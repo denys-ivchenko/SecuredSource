@@ -10,14 +10,10 @@
 	</UserControl.Resources>
     <StackPanel>
 		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 1:</TextBlock>
-		<CheckBox Style="{StaticResource PanelFieldControl}">Value 1</CheckBox>
+		<CheckBox>Value 1</CheckBox>
 		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 2:</TextBlock>
-		<CheckBox Style="{StaticResource PanelFieldControl}">Value 2</CheckBox>
+		<CheckBox>Value 2</CheckBox>
 		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 3:</TextBlock>
-		<CheckBox Style="{StaticResource PanelFieldControl}">Value 3</CheckBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 4:</TextBlock>
-		<CheckBox Style="{StaticResource PanelFieldControl}">Value 4</CheckBox>
-		<TextBlock Style="{StaticResource PanelFieldHeader}">Control 5:</TextBlock>
-		<CheckBox Style="{StaticResource PanelFieldControl}">Value 5</CheckBox>
+		<CheckBox>Value 3</CheckBox>
 	</StackPanel>
 </UserControl>

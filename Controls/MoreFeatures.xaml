@@ -5,11 +5,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 	xmlns:local="clr-namespace:Telesyk.SecuredSource.UI.Controls"
 	xmlns:res="clr-namespace:Telesyk.SecuredSource.Globalization;assembly=Telesyk.SecuredSource.Localization"
-	mc:Ignorable="d" 
-	d:DesignHeight="450" d:DesignWidth="800">
-	<UserControl.Resources>
-		
-	</UserControl.Resources>
+	mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition x:Name="ColumnPanel" Style="{StaticResource ColumnPanel}" />
@@ -17,25 +13,17 @@
 			<ColumnDefinition />
 		</Grid.ColumnDefinitions>
 		<DockPanel Grid.Column="0" Style="{StaticResource Panel}">
-			<StackPanel Style="{StaticResource PanelContainer}">
-				<TextBlock Style="{StaticResource PanelFieldHeader}"><Run Text="{x:Static res:Strings.Algorythm}" />:</TextBlock>
-				<ComboBox x:Name="SelectAlgorythm" SelectionChanged="SelectAlgorythm_SelectionChanged" Style="{StaticResource PanelFieldControl}" />
-				<StackPanel x:Name="PanelLoad" />
-			</StackPanel>
+			<local:PanelControl x:Name="ControlPanel" />
 		</DockPanel>
 		<GridSplitter x:Name="Splitter" Grid.Column="1" Panel.ZIndex="2" DragCompleted="Splitter_DragCompleted" Style="{StaticResource Splitter}" />
 		<StackPanel Grid.Column="2">
 			<Canvas Style="{StaticResource AreaBeginer}" />
 			<StackPanel Style="{StaticResource MainArea}">
 				<local:FilesControl x:Name="ControlFiles" />
-				<local:PasswordControl x:Name="ControlPassword" />
 				<local:ProgressControl x:Name="ControlProgress" Visibility="Hidden" />
-				<StackPanel Orientation="Horizontal">
-					<TextBox x:Name="TextDirectory" />
-					<Button Content="Огляд…" PreviewMouseLeftButtonUp="Button_MouseLeftButtonUp" />
-				</StackPanel>
 				<StackPanel Style="{StaticResource ButtonsArea}">
-					<Button x:Name="ButtonEncrypt" Content="{x:Static res:Strings.Encrypt}" PreviewMouseLeftButtonUp="Button_MouseUp" />
+					<Button x:Name="ButtonStop" Content="{x:Static res:Strings.Stop}" IsEnabled="false" Click="ButtonStop_Click" />
+					<Button x:Name="ButtonStart" Content="{x:Static res:Strings.Start}" Click="ButtonStart_Click" />
 				</StackPanel>
 			</StackPanel>
 		</StackPanel>

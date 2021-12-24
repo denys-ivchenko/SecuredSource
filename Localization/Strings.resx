@@ -126,6 +126,9 @@
   <data name="Algorythm" xml:space="preserve">
     <value>Algorythm</value>
   </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Browse...</value>
+  </data>
   <data name="Decrypt" xml:space="preserve">
     <value>Decrypt</value>
   </data>
@@ -135,8 +138,11 @@
   <data name="DeselectAll" xml:space="preserve">
     <value>Deselect all files</value>
   </data>
-  <data name="Encrypt" xml:space="preserve">
-    <value>Encrypt</value>
+  <data name="Directory" xml:space="preserve">
+    <value>Directory</value>
+  </data>
+  <data name="FileName" xml:space="preserve">
+    <value>File name</value>
   </data>
   <data name="Files" xml:space="preserve">
     <value>Files</value>
@@ -174,11 +180,20 @@
   <data name="Selected" xml:space="preserve">
     <value>selected</value>
   </data>
+  <data name="SelectSavingDirectory" xml:space="preserve">
+    <value>Please select directory to save encrypted package.</value>
+  </data>
   <data name="ShowPassword" xml:space="preserve">
     <value>Show password</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
     <value>Simple &amp; Fast</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stop</value>
   </data>
   <data name="Symbols" xml:space="preserve">
     <value>Symbols</value>

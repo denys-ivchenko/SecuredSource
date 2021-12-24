@@ -126,6 +126,9 @@
   <data name="Algorythm" xml:space="preserve">
     <value>Алгоритм</value>
   </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Просмотр…</value>
+  </data>
   <data name="Decrypt" xml:space="preserve">
     <value>Расшифровать</value>
   </data>
@@ -135,8 +138,11 @@
   <data name="DeselectAll" xml:space="preserve">
     <value>Отменить выделение для всех файлов</value>
   </data>
-  <data name="Encrypt" xml:space="preserve">
-    <value>Зашифровать</value>
+  <data name="Directory" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+  <data name="FileName" xml:space="preserve">
+    <value>Имя файла</value>
   </data>
   <data name="Files" xml:space="preserve">
     <value>Файлы</value>
@@ -171,11 +177,20 @@
   <data name="Selected" xml:space="preserve">
     <value>выбрано</value>
   </data>
+  <data name="SelectSavingDirectory" xml:space="preserve">
+    <value>Пожалуйста, выберите директорию для сохранения зашифрованого пакета.</value>
+  </data>
   <data name="ShowPassword" xml:space="preserve">
     <value>Показать пароль</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
     <value>Просто и быстро</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Начать</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Остановить</value>
   </data>
   <data name="Symbols" xml:space="preserve">
     <value>Символов</value>

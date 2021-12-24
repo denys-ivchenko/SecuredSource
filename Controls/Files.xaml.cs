@@ -38,10 +38,11 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public methods
 
-		public void Test()
-		{
-			
-		}
+		#endregion
+
+		#region Events
+
+		public event EventHandler FilesChanged;
 
 		#endregion
 
@@ -85,14 +86,14 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void ButtonFileDelete_MouseLeave(object sender, MouseEventArgs e)
 		{
-			ensureDeleteButtonStyleAndState();
+			checkDeleteButtonStyleAndState();
 		}
 
 		private void ButtonFileDelete_MouseUp(object sender, MouseEventArgs e)
 		{
 			deleteFiles();
 
-			ensureDeleteButtonStyleAndState();
+			checkDeleteButtonStyleAndState();
 		}
 
 		private void ButtonFileSelectAll_MouseDown(object sender, MouseButtonEventArgs e)
@@ -103,12 +104,12 @@ namespace Telesyk.SecuredSource.UI.Controls
 		private void ButtonFileSelectAll_MouseUp(object sender, MouseButtonEventArgs e)
 		{
 			setAllFilesSelection(true);
-			ensureAllSelectableButtonsState();
+			checkAllSelectableButtonsState();
 		}
 
 		private void ButtonFileSelectAll_MouseLeave(object sender, MouseEventArgs e)
 		{
-			ensureAllSelectableButtonsState();
+			checkAllSelectableButtonsState();
 		}
 
 		private void ButtonFileDeselectAll_MouseDown(object sender, MouseButtonEventArgs e)
@@ -119,12 +120,12 @@ namespace Telesyk.SecuredSource.UI.Controls
 		private void ButtonFileDeselectAll_MouseUp(object sender, MouseButtonEventArgs e)
 		{
 			setAllFilesSelection(false);
-			ensureAllSelectableButtonsState();
+			checkAllSelectableButtonsState();
 		}
 
 		private void ButtonFileDeselectAll_MouseLeave(object sender, MouseEventArgs e)
 		{
-			ensureAllSelectableButtonsState();
+			checkAllSelectableButtonsState();
 		}
 
 		private void PanelFiles_MouseDown(object sender, MouseButtonEventArgs e)
@@ -140,13 +141,13 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#endregion
 
-		private void ensureDeleteButtonStyleAndState()
+		private void checkDeleteButtonStyleAndState()
 		{
 			ButtonFileDelete.Style = (Style)FindResource($"FileButtonDelete{(_selectedFiles.Count == 0 ? "Disabled" : null)}");
 			ButtonFileDelete.IsEnabled = _selectedFiles.Count > 0;
 		}
 
-		private void ensureAllSelectableButtonsState()
+		private void checkAllSelectableButtonsState()
 		{
 			ButtonFileDeselectAll.Style = (Style)FindResource($"FileButtonDeselectAll{(_selectedFiles.Count == 0 ? "Disabled" : null)}");
 			ButtonFileDeselectAll.IsEnabled = _selectedFiles.Count > 0;
@@ -170,8 +171,8 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 			TextSelectedFileCount.Text = _selectedFiles.Count.ToString();
 
-			ensureDeleteButtonStyleAndState();
-			ensureAllSelectableButtonsState();
+			checkDeleteButtonStyleAndState();
+			checkAllSelectableButtonsState();
 		}
 
 		private void addFiles()
@@ -181,7 +182,10 @@ namespace Telesyk.SecuredSource.UI.Controls
 			fileDialog.FileOk += FileDialog_FileOk;
 			fileDialog.ShowDialog();
 
-			ensureAllSelectableButtonsState();
+			checkAllSelectableButtonsState();
+
+			if (FilesChanged != null)
+				FilesChanged(this, EventArgs.Empty);
 		}
 
 		private void deleteFiles()
@@ -194,7 +198,11 @@ namespace Telesyk.SecuredSource.UI.Controls
 				}
 
 			bindFiles();
-			ensureAllSelectableButtonsState();
+
+			checkAllSelectableButtonsState();
+
+			if (FilesChanged != null)
+				FilesChanged(this, EventArgs.Empty);
 		}
 
 		private void readDialogFiles(OpenFileDialog dialog)

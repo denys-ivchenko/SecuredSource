@@ -41,8 +41,6 @@
 		<Setter Property="Control.Margin" Value="8,0,0,0" />
 		<Setter Property="Control.Foreground" Value="#b7ccdd" />
 	</Style>
-
-
 	<Style x:Key="ColumnPanel">
 		<Setter Property="ColumnDefinition.MinWidth" Value="150" />
 		<Setter Property="ColumnDefinition.MaxWidth" Value="300" />
@@ -50,17 +48,55 @@
 	<Style x:Key="Panel">
 		<Setter Property="DockPanel.Background" Value="#dfecf7" />
 		<Setter Property="Control.Foreground" Value="#455868" />
-		<Setter Property="Control.FontSize" Value="12" />
 	</Style>
 	<Style x:Key="PanelContainer" BasedOn="{StaticResource Panel}">
-		<Setter Property="Control.Margin" Value="12,0,7,8" />
+		<Setter Property="Control.Margin" Value="12,5,7,8" />
+		<Style.Resources>
+			<Style x:Key="Text">
+				<Setter Property="Control.FontSize" Value="11" />
+				<Setter Property="Control.Foreground" Value="#19222a" />
+			</Style>
+			<Style x:Key="TextBox" BasedOn="{StaticResource Text}">
+				<Setter Property="Control.BorderBrush" Value="#b9cad7" />
+				<Setter Property="Control.BorderThickness" Value="1" />
+				<Setter Property="Control.Height" Value="20" />
+				<Setter Property="Control.SnapsToDevicePixels" Value="True" />
+			</Style>
+			<Style TargetType="PasswordBox" BasedOn="{StaticResource TextBox}">
+				
+			</Style>
+			<Style TargetType="TextBox" BasedOn="{StaticResource TextBox}">
+
+			</Style>
+			<Style TargetType="ComboBox" BasedOn="{StaticResource TextBox}">
+
+			</Style>
+			<Style TargetType="ComboBoxItem" BasedOn="{StaticResource Text}">
+				<Setter Property="Control.Height" Value="19" />
+			</Style>
+			<Style TargetType="Button" BasedOn="{StaticResource TextBox}">
+				<Setter Property="Control.Margin" Value="1,0,0,0" />
+				<Setter Property="Control.Height" Value="20" />
+				<Setter Property="Control.Width" Value="20" />
+			</Style>
+		</Style.Resources>
 	</Style>
 	<Style x:Key="PanelFieldHeader">
-		<Setter Property="Control.Margin" Value="1,8,0,4" />
+		<Setter Property="Control.Margin" Value="1,4,0,2" />
+		<Setter Property="Control.FontSize" Value="14" />
+	</Style>
+	<Style x:Key="PanelFieldHeaderValue">
+		<Setter Property="Control.FontSize" Value="11" />
+		<Setter Property="Control.HorizontalAlignment" Value="Right" />
+		<Setter Property="Control.VerticalAlignment" Value="Bottom" />
+		<Setter Property="Control.Margin" Value="0,0,0,2" />
 	</Style>
 	<Style x:Key="PanelFieldControl">
 		<Setter Property="Control.FontSize" Value="11" />
 		<Setter Property="Control.Foreground" Value="#19222a" />
+		<Setter Property="Border.BorderBrush" Value="#b9cad7" />
+		<Setter Property="Border.BorderThickness" Value="1" />
+		<Setter Property="Border.SnapsToDevicePixels" Value="True" />
 	</Style>
 	<Style x:Key="TextCaption">
 		<Setter Property="Control.Margin" Value="0,0,0,4" />
@@ -108,7 +144,7 @@
 		</Setter>
 	</Style>
 	<Style x:Key="MainArea">
-		<Setter Property="Control.Margin" Value="12,8,12,12" />
+		<Setter Property="Control.Margin" Value="12,6,12,12" />
 	</Style>
 	<Style x:Key="FilesArea">
 	</Style>
@@ -116,6 +152,7 @@
 		<Setter Property="Border.BorderBrush" Value="#b9cad7" />
 		<Setter Property="Border.BorderThickness" Value="1" />
 		<Setter Property="Border.SnapsToDevicePixels" Value="True" />
+		<Setter Property="Border.Padding" Value="0,1" />
 	</Style>
 	<Style x:Key="File">
 		<Setter Property="Control.Margin" Value="2,1" />
@@ -125,7 +162,7 @@
 			<Style TargetType="TextBlock">
 				<Setter Property="Control.FontSize" Value="11" />
 				<Setter Property="Control.Foreground" Value="#19222a" />
-				<Setter Property="Control.Margin" Value="3,1,3,3" />
+				<Setter Property="Control.Margin" Value="3,1,3,2" />
 			</Style>
 		</Style.Resources>
 	</Style>
@@ -198,10 +235,12 @@
 		<Setter Property="Control.Foreground" Value="#19222a" />
 	</Style>
 	<Style x:Key="ButtonsArea">
-		<Setter Property="Control.HorizontalAlignment" Value="Right" />
+		<Setter Property="StackPanel.Orientation" Value="Horizontal" />
+		<Setter Property="StackPanel.HorizontalAlignment" Value="Right" />
 		<Style.Resources>
 			<Style TargetType="Button">
-				<Setter Property="Control.Margin" Value="12,0,0,0" />
+				<Setter Property="Button.Margin" Value="4,0,0,0" />
+				<Setter Property="Button.Width" Value="70" />
 			</Style>
 		</Style.Resources>
 	</Style>
@@ -209,10 +248,10 @@
 		<Setter Property="Control.BorderBrush" Value="Red" />
 		<Setter Property="Control.BorderThickness" Value="1" />
 	</Style>
-	<Style x:Key="Password">
-		<Setter Property="Control.Margin" Value="0,4,0,0" />
+	<Style x:Key="MainAreaControl">
+		<Setter Property="Control.Margin" Value="0,4" />
 		<Style.Resources>
-			<Style TargetType="Border">
+			<!--<Style TargetType="Border">
 				<Setter Property="Border.BorderBrush" Value="#b9cad7" />
 				<Setter Property="Border.BorderThickness" Value="1" />
 				<Setter Property="Border.SnapsToDevicePixels" Value="True" />
@@ -226,7 +265,7 @@
 						<Setter Property="Control.Height" Value="16" />
 					</Style>
 				</Style.Resources>
-			</Style>
+			</Style>-->
 			<Style TargetType="TextBlock">
 				<Setter Property="Control.HorizontalAlignment" Value="Right" />
 				<Setter Property="Control.Margin" Value="0,6,0,0" />
@@ -240,14 +279,14 @@
 			</Style>
 		</Style.Resources>
 	</Style>
-	<Style x:Key="VisiblePasswordImage">
+	<Style x:Key="PasswordImage">
 		<Setter Property="Image.Cursor" Value="Hand" />
 		<Setter Property="Image.Width" Value="16" />
 		<Setter Property="Image.Height" Value="16" />
 		<Setter Property="Image.Opacity" Value="1" />
 		<Setter Property="Image.SnapsToDevicePixels" Value="True" />
 	</Style>
-	<Style x:Key="UnvisiblePasswordImage" BasedOn="{StaticResource VisiblePasswordImage}">
+	<Style x:Key="UnvisiblePasswordImage" BasedOn="{StaticResource PasswordImage}">
 		<Setter Property="Image.Opacity" Value="0.5" />
 	</Style>
 	<Style x:Key="ProgressGrid">
