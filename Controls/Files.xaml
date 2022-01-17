@@ -6,11 +6,11 @@
 	xmlns:local="clr-namespace:Telesyk.SecuredSource.UI.Controls"
 	xmlns:res="clr-namespace:Telesyk.SecuredSource.Globalization;assembly=Telesyk.SecuredSource.Localization"
 	mc:Ignorable="d" 
-	d:DesignHeight="450" d:DesignWidth="800">
+	d:DesignHeight="300" d:DesignWidth="300">
 	<StackPanel x:Name="PanelMainAreaLoad" Style="{StaticResource FilesArea}">
 		<TextBlock Style="{StaticResource TextCaption}"><Run Text="{x:Static res:Strings.Files}" />:</TextBlock>
 		<Border Style="{StaticResource FilesAreaBorder}">
-			<ScrollViewer Height="140">
+			<ScrollViewer Height="147">
 				<StackPanel x:Name="PanelFiles" />
 			</ScrollViewer>
 		</Border>

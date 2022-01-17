@@ -40,16 +40,23 @@
     <AssemblyOriginatorKeyFile>SecuredSource.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlStateOperator.cs" />
+    <Compile Include="IEnablingState.cs" />
+    <Compile Include="PasswordSize.cs" />
     <Compile Include="ApplicationMode.cs" />
     <Compile Include="ApplicationSettings.cs" />
     <Compile Include="EncryptionPack.cs" />
@@ -75,6 +82,10 @@
     <ProjectReference Include="..\..\..\Components\Crypton\Solution\Crypton\Crypton.csproj">
       <Project>{f9610d8c-d083-463b-896f-d87cf1b31e6f}</Project>
       <Name>Crypton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Components\Utils\Solution\Utils\Utils.csproj">
+      <Project>{55f6caa8-6338-4db7-b9ec-c0f25e4a2799}</Project>
+      <Name>Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

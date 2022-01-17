@@ -11,7 +11,7 @@
         Title="{x:Static res:Strings.Title}" FontFamily="Segoe UI" FontSize="10" Height="424" Width="600" ResizeMode="CanMinimize" WindowStyle="SingleBorderWindow">
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="47" />
+			<RowDefinition Height="47" Style="{StaticResource Header}" />
 			<RowDefinition />
 			<RowDefinition Height="17" />
 		</Grid.RowDefinitions>
@@ -19,6 +19,7 @@
 			<StackPanel Style="{StaticResource HeaderContainer}" RadioButton.Checked="radioMode_Checked">
 				<RadioButton x:Name="RadioSimpleAndFast" Content="{x:Static res:Strings.SimpleAndFast}" Style="{StaticResource HeaderSimpleAndFastRadio}" />
 				<RadioButton x:Name="RadioMoreFeatures" Content="{x:Static res:Strings.MoreFeatures}" Style="{StaticResource HeaderRadio}" />
+			
 			</StackPanel>
 		</StackPanel>
 		<DockPanel Name="ControlMainArea" Grid.Row="1" Panel.ZIndex="3" />

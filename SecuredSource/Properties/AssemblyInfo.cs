@@ -1,22 +1,17 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-// Общие сведения об этой сборке предоставляются следующим набором
-// набор атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
-// связанные со сборкой.
 [assembly: AssemblyTitle("Secured Source")]
-[assembly: AssemblyDescription("Cryptographic file encryption software")]
+[assembly: AssemblyDescription("Crypto Studio sowtware element.")]
 [assembly: AssemblyConfiguration("Debug")]
 [assembly: AssemblyCompany("Telesyk")]
-[assembly: AssemblyProduct("Secured Source")]
+[assembly: AssemblyProduct("Crypto Studio")]
 [assembly: AssemblyCopyright("Copyright © Telesyk 2021")]
-[assembly: AssemblyTrademark("Telesyk Cryptographic Software")]
+[assembly: AssemblyTrademark("Telesyk Software")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.0.1.*")]
-[assembly: AssemblyFileVersion("1.0.1.22")]
+[assembly: AssemblyFileVersion("1.0.1.23")]
 
 [assembly: ComVisible(false)]
 [assembly: ThemeInfo(ResourceDictionaryLocation.None, ResourceDictionaryLocation.SourceAssembly)]

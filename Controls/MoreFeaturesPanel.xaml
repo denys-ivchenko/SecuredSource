@@ -1,18 +1,16 @@
-﻿<UserControl x:Class="Telesyk.SecuredSource.UI.Controls.PanelControl"
+﻿<UserControl x:Class="Telesyk.SecuredSource.UI.Controls.MoreFeaturesPanelControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:Telesyk.SecuredSource.UI.Controls"
 	xmlns:res="clr-namespace:Telesyk.SecuredSource.Globalization;assembly=Telesyk.SecuredSource.Localization"
-	mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800">
+	mc:Ignorable="d" d:DesignHeight="350" d:DesignWidth="240">
 	<StackPanel Style="{StaticResource PanelContainer}">
 		<TextBlock Style="{StaticResource PanelFieldHeader}"><Run Text="{x:Static res:Strings.FileName}" />:</TextBlock>
 		<TextBox x:Name="TextFileName" />
 		<local:SelectDirectoryControl x:Name="ControlDirectory" />
 		<local:PasswordControl x:Name="ControlPassword" />
-		<TextBlock Style="{StaticResource PanelFieldHeader}"><Run Text="{x:Static res:Strings.Algorythm}" />:</TextBlock>
-		<ComboBox x:Name="SelectAlgorythm" SelectionChanged="SelectAlgorythm_SelectionChanged" />
-		<StackPanel x:Name="PanelLoad" />
+		<local:SelectAlgorithmControl x:Name="ControlSelectAlgorithm" />
 	</StackPanel>
 </UserControl>

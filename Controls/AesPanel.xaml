@@ -14,15 +14,9 @@
 				<ColumnDefinition />
 				<ColumnDefinition />
 			</Grid.ColumnDefinitions>
-			<StackPanel Grid.Column="0" Style="{StaticResource PanelAesPasswordLength}">
-				<RadioButton x:Name="RadioAesPasswordLength16" Content="16" Checked="RadioAesPasswordLength_Checked" />
-			</StackPanel>
-			<StackPanel Grid.Column="1" Style="{StaticResource PanelAesPasswordLengthTwo}">
-				<RadioButton x:Name="RadioAesPasswordLength24" Content="24" Checked="RadioAesPasswordLength_Checked" />
-			</StackPanel>
-			<StackPanel Grid.Column="2" Style="{StaticResource PanelAesPasswordLengthThree}">
-				<RadioButton x:Name="RadioAesPasswordLength32" Content="32" Checked="RadioAesPasswordLength_Checked" />
-			</StackPanel>
+			<RadioButton Grid.Column="0" x:Name="RadioAesPasswordLength16" Content="16" Checked="RadioAesPasswordLength_Checked" />
+			<RadioButton Grid.Column="1" x:Name="RadioAesPasswordLength24" Content="24" Checked="RadioAesPasswordLength_Checked" />
+			<RadioButton Grid.Column="2" x:Name="RadioAesPasswordLength32" Content="32" Checked="RadioAesPasswordLength_Checked" />
 		</Grid>
 	</StackPanel>
 </UserControl>

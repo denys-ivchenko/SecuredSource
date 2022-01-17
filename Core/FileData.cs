@@ -29,9 +29,7 @@ namespace Telesyk.SecuredSource
 
 		public string Path { get; private set; }
 
-		public int ByteCount { get; private set; }
-
-		public int EncryptedByteCount { get; private set; }
+		public long ByteCount { get; private set; }
 
 		public bool MissingReadAccess { get; private set; }
 
@@ -48,7 +46,7 @@ namespace Telesyk.SecuredSource
 			try
 			{
 				using (var stream = File.OpenRead(fullName))
-					ByteCount = (int)stream.Length;
+					ByteCount = stream.Length;
 			}
 			catch { MissingReadAccess = true; }
 		}

@@ -1,10 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Telesyk.Cryptography;
 
 //using var client = new HttpClient();
 //var content = await client.GetStringAsync("http://webcode.me");
@@ -21,7 +21,53 @@ namespace Tests
 
 		static void Main(string[] args)
 		{
-			testAsPro();
+			//createBigText();
+
+			var icon = System.Drawing.Icon.ExtractAssociatedIcon("C:\\test.docx");
+
+			using (FileStream stream = new FileStream("d:\\test.ico", FileMode.Create))
+				icon.Save(stream);
+
+			createArchive();
+
+			readArchive();
+		}
+
+		private static void readArchive()
+		{
+			using (var file = new FileStream(@"C:\Users\Denys\Desktop\temp-archive.zip", FileMode.Open))
+			using (var archive = new ZipArchive(file, ZipArchiveMode.Read))
+			using (var target = new FileStream(@"C:\Users\Denys\Desktop\re___file.txt", FileMode.Create))
+			{
+				var entry = archive.GetEntry("temp.txt");
+
+				byte[] data = new byte[entry.Length];
+
+				target.Write(data, 0, data.Length);
+			}
+		}
+
+		private static void createArchive()
+		{
+			using (var file = new FileStream(@"C:\Users\Denys\Desktop\temp-archive.zip", FileMode.Create))
+			using (var archive = new GZipStream(file, CompressionLevel.Fastest))
+			using(var source = new FileStream(@"C:\Users\Denys\Desktop\___file.txt", FileMode.Open))
+			{
+				byte[] data = new byte[source.Length];
+
+				source.Read(data, 0, (int)source.Length);
+
+				archive.Write(data, 0, data.Length);
+			}
+		}
+
+		static void createBigText()
+		{
+			using (var file = new System.IO.StreamWriter(@"C:\Users\Denys\Desktop\file.txt"))
+			{
+				for (var i = 0; i < 300000; i++)
+					file.WriteLine("У попа была собака он ее любил, она съела кусок мяса, он ее убил, закопал и написал:");
+			}
 		}
 
 		private static void testAsPro()
@@ -31,7 +77,7 @@ namespace Tests
 
 		private static async void testAsProAsync()
 		{
-			testAsMethodAsync();
+			await testAsMethodAsync();
 		}
 
 
@@ -40,16 +86,10 @@ namespace Tests
 
 			await Task.Run(() =>
 			{
+				start();
 			});
-			
+
 		}
-
-
-
-
-
-
-
 
 		private static void start()
 		{

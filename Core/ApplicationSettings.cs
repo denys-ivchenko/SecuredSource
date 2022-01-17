@@ -5,6 +5,7 @@ using System.Security.AccessControl;
 using System.IO;
 using System.Xml;
 
+using Telesyk;
 using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource
@@ -14,6 +15,7 @@ namespace Telesyk.SecuredSource
 		#region Private declarations
 		
 		private static Lazy<ApplicationSettings> _instance = new Lazy<ApplicationSettings>(() => new ApplicationSettings());
+		private Dictionary<CryptoAlgorithm, PasswordSize> _passwordSizes = new Dictionary<CryptoAlgorithm, PasswordSize>();
 
 		#region Constants
 
@@ -27,16 +29,18 @@ namespace Telesyk.SecuredSource
 		private const string _NODENAME_PANEL_WIDTH = "panel-width";
 		private const string _NODENAME_DIRECTORY = "directory";
 		private const string _NODENAME_FILE_NAME = "file-name";
-		private const string _NODENAME_ALGORYTHM = "algorythm";
-		private const string _NODENAME_AES_PASSWORD_LENGTH = "aes-password-length";
-		private const string _NODENAME_RIJNDAEL_PASSWORD_LENGTH = "rijndael-password-length";
-		private const string _NODENAME_DES_PASSWORD_LENGTH = "des-password-length";
-		private const string _NODENAME_TRIPLEDES_PASSWORD_LENGTH = "tripledes-password-length";
-		private const string _NODENAME_RC5_PASSWORD_LENGTH = "rc5-password-length";
+		private const string _NODENAME_ALGORITHM = "algorythm";
+		private const string _NODENAME_REQUIRED_PASSWORD_LENGTH = "required-password-length";
+		//private const string _NODENAME_AES_PASSWORD_LENGTH = "aes-password-length";
+		//private const string _NODENAME_RIJNDAEL_PASSWORD_LENGTH = "rijndael-password-length";
+		//private const string _NODENAME_DES_PASSWORD_LENGTH = "des-password-length";
+		//private const string _NODENAME_TRIPLEDES_PASSWORD_LENGTH = "tripledes-password-length";
+		//private const string _NODENAME_RC5_PASSWORD_LENGTH = "rc5-password-length";
 
 		#endregion
 
 		private ApplicationMode _mode = ApplicationMode.SimpleAndFast;
+		private CryptoAlgorithm _algorithm = CryptoAlgorithm.RC2;
 		private int _windowWidth = 600;
 		private int _windowHeight = 420;
 		private int _windowTop = 200;
@@ -44,12 +48,14 @@ namespace Telesyk.SecuredSource
 		private int _panelWidth = 160;
 		private string _directory = null;
 		private string _fileName = null;
-		private int _aesPasswordLength = 16;
-		private int _rijndaelPasswordLength = 12;
-		private int _desPasswordLength = 5;
-		private int _tripleDesPasswordLength = 8;
-		private int _rc5PasswordLength = 11;
-		private SymmetricAlgorithmName _algorythm = SymmetricAlgorithmName.RC2;
+		private int _requiredPasswordLength = 16;
+		private int _passwordLength;
+		private int _fileQuantity;
+		//private int _aesPasswordLength = 16;
+		//private int _rijndaelPasswordLength = 16;
+		//private int _desPasswordLength = 8;
+		//private int _tripleDesPasswordLength = 16;
+		//private int _rc2PasswordLength = 5;
 
 		#endregion
 
@@ -74,32 +80,16 @@ namespace Telesyk.SecuredSource
 
 		public static ApplicationSettings Current { get => _instance.Value; }
 
-		public int PasswordLength
-		{
-			get
-			{
-				switch(Algorythm)
-				{
-					case SymmetricAlgorithmName.Aes:
-						return AesPasswordLength;
-					case SymmetricAlgorithmName.Rijndael:
-						return RijndaelPasswordLength;
-					case SymmetricAlgorithmName.DES:
-						return DESPasswordLength;
-					case SymmetricAlgorithmName.TripleDES:
-						return TripleDESPasswordLength;
-					case SymmetricAlgorithmName.RC2:
-						return RC5PasswordLength;
-				}
-
-				return 0;
-			}
-		}
-
 		public ApplicationMode Mode
 		{
 			get { return _mode; }
 			set { _mode = writeSettingValue(_NODENAME_MODE, value); }
+		}
+
+		public CryptoAlgorithm Algorithm
+		{
+			get => _algorithm;
+			set { changeAlgorithm(value); }
 		}
 
 		public int WindowWidth
@@ -144,47 +134,69 @@ namespace Telesyk.SecuredSource
 			set { _fileName = writeSettingValue(_NODENAME_FILE_NAME, value); }
 		}
 
-		public SymmetricAlgorithmName Algorythm
+		public int RequiredPasswordLength
 		{
-			get => _algorythm;
-			set { changeAlgorythmSettingValue(_NODENAME_ALGORYTHM, value, ref _algorythm, true); }
+			get => _requiredPasswordLength;
+			set { _requiredPasswordLength = writeSettingValue(_NODENAME_REQUIRED_PASSWORD_LENGTH, value); }
 		}
 
-		public int AesPasswordLength
-		{
-			get => _aesPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value, ref _aesPasswordLength, SymmetricAlgorithmName.Aes == Algorythm); }
+		public int PasswordLength 
+		{	
+			get => _passwordLength; 
+			set { changePasswordLength(value); }
 		}
 
-		public int RijndaelPasswordLength
+		public int FileQuantity
 		{
-			get => _rijndaelPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_RIJNDAEL_PASSWORD_LENGTH, value, ref _rijndaelPasswordLength, SymmetricAlgorithmName.Rijndael == Algorythm); }
+			get => _fileQuantity;
+			set { changeFileQuantity(value); }
 		}
 
-		public int DESPasswordLength
-		{
-			get => _desPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_DES_PASSWORD_LENGTH, value, ref _desPasswordLength, SymmetricAlgorithmName.DES == Algorythm); }
-		}
+		//public int AesPasswordLength
+		//{
+		//	get => _aesPasswordLength;
+		//	set { changeAlgorythmSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value, ref _aesPasswordLength, CryptoAlgorithm.Aes == Algorythm); }
+		//}
 
-		public int TripleDESPasswordLength
-		{
-			get => _tripleDesPasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_TRIPLEDES_PASSWORD_LENGTH, value, ref _tripleDesPasswordLength, SymmetricAlgorithmName.TripleDES == Algorythm); }
-		}
+		//public int RijndaelPasswordLength
+		//{
+		//	get => _rijndaelPasswordLength;
+		//	set { changeAlgorythmSettingValue(_NODENAME_RIJNDAEL_PASSWORD_LENGTH, value, ref _rijndaelPasswordLength, CryptoAlgorithm.Rijndael == Algorythm); }
+		//}
 
-		public int RC5PasswordLength
-		{
-			get => _rc5PasswordLength;
-			set { changeAlgorythmSettingValue(_NODENAME_RC5_PASSWORD_LENGTH, value, ref _rc5PasswordLength, SymmetricAlgorithmName.RC2 == Algorythm); }
-		}
+		//public int DESPasswordLength
+		//{
+		//	get => _desPasswordLength;
+		//	set { changeAlgorythmSettingValue(_NODENAME_DES_PASSWORD_LENGTH, value, ref _desPasswordLength, CryptoAlgorithm.DES == Algorythm); }
+		//}
+
+		//public int TripleDESPasswordLength
+		//{
+		//	get => _tripleDesPasswordLength;
+		//	set { changeAlgorythmSettingValue(_NODENAME_TRIPLEDES_PASSWORD_LENGTH, value, ref _tripleDesPasswordLength, CryptoAlgorithm.TripleDES == Algorythm); }
+		//}
+
+		//public int RC5PasswordLength
+		//{
+		//	get => _rc2PasswordLength;
+		//	set { changeAlgorythmSettingValue(_NODENAME_RC5_PASSWORD_LENGTH, value, ref _rc2PasswordLength, CryptoAlgorithm.RC2 == Algorythm); }
+		//}
+
+		public PasswordSize PasswordSize => getPasswordSize(Algorithm);
+
+		#endregion
+
+		#region Public methods
 
 		#endregion
 
 		#region Events
 
-		public event EventHandler AlgorythmChanged;
+		public event EventHandler AlgorithmChanged;
+
+		public event EventHandler PasswordChanged;
+
+		public event EventHandler FileQuantityChanged;
 
 		#endregion
 
@@ -213,8 +225,8 @@ namespace Telesyk.SecuredSource
 			readIntegerSetting(_NODENAME_PANEL_WIDTH, ref _panelWidth);
 			readStringSetting(_NODENAME_DIRECTORY, ref _directory);
 			readStringSetting(_NODENAME_FILE_NAME, ref _fileName);
-			readEnumSetting<SymmetricAlgorithmName>(_NODENAME_ALGORYTHM, ref _algorythm);
-			readIntegerSetting(_NODENAME_AES_PASSWORD_LENGTH, ref _aesPasswordLength);
+			readEnumSetting<CryptoAlgorithm>(_NODENAME_ALGORITHM, ref _algorithm);
+			readIntegerSetting(_NODENAME_REQUIRED_PASSWORD_LENGTH, ref _requiredPasswordLength);
 
 			_directory = !string.IsNullOrEmpty(_directory) ? _directory : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 		}
@@ -298,16 +310,6 @@ namespace Telesyk.SecuredSource
 				return value;
 		}
 
-		private void changeAlgorythmSettingValue<T>(string nodeName, T value, ref T field, bool isCurrent)
-		{
-			writeSettingValue(nodeName, value);
-
-			field = value;
-
-			if (isCurrent && AlgorythmChanged != null)
-				AlgorythmChanged(this, EventArgs.Empty);
-		}
-
 		#endregion
 
 		#region IO operation
@@ -325,8 +327,8 @@ namespace Telesyk.SecuredSource
 			writeSettingValue(_NODENAME_PANEL_WIDTH, PanelWidth, true);
 			writeSettingValue(_NODENAME_DIRECTORY, Directory, true);
 			writeSettingValue(_NODENAME_FILE_NAME, FileName, true);
-			writeSettingValue(_NODENAME_ALGORYTHM, Algorythm, true);
-			writeSettingValue(_NODENAME_AES_PASSWORD_LENGTH, AesPasswordLength, true);
+			writeSettingValue(_NODENAME_ALGORITHM, Algorithm, true);
+			writeSettingValue(_NODENAME_REQUIRED_PASSWORD_LENGTH, RequiredPasswordLength, true);
 
 			SettingsXml.Save(XmlFilePath);
 		}
@@ -377,6 +379,76 @@ namespace Telesyk.SecuredSource
 		}
 
 		#endregion
+
+		#region Password sizes
+
+		private PasswordSize getPasswordSize(CryptoAlgorithm algorithm)
+		{
+			if (!_passwordSizes.ContainsKey(algorithm))
+			{
+				var size = createSize(algorithm);
+				_passwordSizes.Add(size.Algorithm, size);
+
+				return size;
+			}
+
+			return _passwordSizes[algorithm];
+		}
+
+		private PasswordSize createSize(CryptoAlgorithm algorithm)
+		{
+			switch(algorithm)
+			{
+				case CryptoAlgorithm.Aes:
+					return new PasswordSize(CryptoAlgorithm.Aes, 16, 32, 8);
+				case CryptoAlgorithm.Rijndael:
+					return new PasswordSize(CryptoAlgorithm.Rijndael, 16, 32, 8);
+				case CryptoAlgorithm.DES:
+					return new PasswordSize(CryptoAlgorithm.DES, 8, 8, 0);
+				case CryptoAlgorithm.TripleDES:
+					return new PasswordSize(CryptoAlgorithm.TripleDES, 16, 24, 8);		
+			}
+
+			return new PasswordSize(CryptoAlgorithm.RC2, 5, 128, 1);
+		}
+
+		#endregion
+
+		private void changeAlgorithm(CryptoAlgorithm algorithm)
+		{
+			_algorithm = writeSettingValue(_NODENAME_ALGORITHM, algorithm);
+
+			if (PasswordLength > 0 && PasswordSize.MaxSize > RequiredPasswordLength & PasswordSize.MaxSize > PasswordLength)
+			{
+				for (var i = 0; i < PasswordSize.Quantity; i++)
+					if (ApplicationSettings.Current.PasswordSize[i] >= RequiredPasswordLength && ApplicationSettings.Current.PasswordSize[i] >= PasswordLength)
+					{
+						RequiredPasswordLength = ApplicationSettings.Current.PasswordSize[i];
+						break;
+					}
+			}
+			else
+				_requiredPasswordLength = PasswordSize.MaxSize;
+
+			if (AlgorithmChanged != null)
+				AlgorithmChanged(this, new ValueProcessedEventArgs<CryptoAlgorithm>(Algorithm));
+		}
+
+		private void changePasswordLength(int value)
+		{
+			_passwordLength = value;
+			
+			if (PasswordChanged != null)
+				PasswordChanged(this, new ValueProcessedEventArgs<int>(PasswordLength));
+		}
+
+		private void changeFileQuantity(int value)
+		{
+			_fileQuantity = value;
+
+			if (FileQuantityChanged != null)
+				FileQuantityChanged(this, new ValueProcessedEventArgs<int>(FileQuantity));
+		}
 
 		#endregion
 	}

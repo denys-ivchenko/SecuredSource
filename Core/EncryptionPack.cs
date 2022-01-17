@@ -14,9 +14,7 @@ namespace Telesyk.SecuredSource
 	{
 		#region Private declarations
 
-		private CancellationTokenSource _cancel;
-		private int _totalByteComplitted;
-		private int _lastPercentage;
+		private long _totalByteComplitted;
 
 		#endregion
 
@@ -59,9 +57,9 @@ namespace Telesyk.SecuredSource
 
 		public PackData FilePack { get; private set; }
 
-		public int TotalBytes { get; private set; }
+		public long TotalBytes { get; private set; }
 
-		public int BytesComplitted
+		public long BytesComplitted
 		{
 			get => _totalByteComplitted + CurrentByteComplitted;
 			private set
@@ -71,15 +69,31 @@ namespace Telesyk.SecuredSource
 			}
 		}
 
-		public int CurrentByteComplitted { get; private set; }
+		public AggregateException Exception { get; private set; }
+
+		public long CurrentByteComplitted { get; private set; }
+
+		public bool IsFinished { get; private set; }
+
+		public bool IsCompleted{ get; private set; }
 
 		public bool IsCanceled { get; private set; }
+
+		public bool IsFaulted { get; private set; }
+
+		#endregion
+
+		#region Internal properties
+
+		internal SymmetricEncryptor Encryptor { get; private set; }
 
 		#endregion
 
 		#region Public methods
 
-		public void Process() => process();
+		public void Serialize() => serialize();
+
+		public void Deserialize() => deserialize();
 
 		public void Cancel() => cancel();
 
@@ -87,13 +101,17 @@ namespace Telesyk.SecuredSource
 
 		#region Public events
 
-		public event ProgressEventHandler Progress;
+		//public event ProgressEventHandler Progress;
+
+		public event ValueProcessedEventHandler<int> Processed;
+
+		public event EventHandler Finished;
 
 		public event EventHandler Completted;
 
 		public event EventHandler Canceled;
 
-		public event EventHandler Finished;
+		public event EventHandler Faulted;
 
 		#endregion
 
@@ -106,10 +124,6 @@ namespace Telesyk.SecuredSource
 
 		#endregion
 
-		#region Overrided methods
-
-		#endregion
-
 		#region Private methods
 
 		private void init()
@@ -119,205 +133,125 @@ namespace Telesyk.SecuredSource
 			if (Mode == EncryptedPackMode.Deserialize)
 				using (FileStream stream = new FileStream(FilePath, FileMode.Open))
 					TotalBytes = (int)stream.Length;
-
-			//Crypton.Instance.Progress += Crypton_Progress;
 		}
 
-		private async void process()
+		private void resetForStart()
 		{
-			_cancel = new CancellationTokenSource();
-			_lastPercentage = 0;
-
-			await processAsync();
-		}
-
-		private async Task processAsync()
-		{
-			Debug.WriteLine("process()");
-			
-			Action action = () => serialize();
-			
-			if (Mode == EncryptedPackMode.Deserialize)
-				action = () => deserialize();
-
-			await Task.Run(action, _cancel.Token);
-
-			if (Completted != null)
-				Completted(this, EventArgs.Empty);
-
-			if (Finished != null)
-				Finished(this, EventArgs.Empty);
-
-			Debug.WriteLine("process.");
+			IsFinished = IsCompleted = IsCanceled = IsFaulted = false;
+			Exception = null;
 		}
 
 		private void cancel()
 		{
-			_cancel.Cancel();
+			var encryptor = Encryptor;
 
-			if (Canceled != null)
-				Canceled(this, EventArgs.Empty);
+			if (encryptor != null && !encryptor.IsCanceled)
+				encryptor.Cancel();
+		}
+
+		private async void serialize()
+		{
+			resetForStart();
+
+			var pack = PackData.Serialize(FilePack);
+
+			TotalBytes = 4 + pack.Length + FilePack.TotalBytes;
+
+			Task task = null;
+
+			ControlStateOperator.Operator.DisableForEncryptionProcess();
+
+			using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Create, ApplicationSettings.Current.Algorithm, PasswordBytes))
+			{
+				Encryptor.Processed += Encryptor_Processed;
+
+				await (task = Task.Run(() => Encryptor.WriteAsync(pack.Length)));
+
+				await (task = Task.Run(() => Encryptor.WriteAsync(pack)));
+
+				foreach (var file in FilePack)
+					await (task = Task.Run(() => Encryptor.EncryptAsync(file.FullName)));
+
+				Exception = task.Exception;
+
+				IsFinished = true;
+
+				IsCompleted = task.IsCompleted;
+				IsCanceled = task.IsCanceled;
+				IsFaulted = task.IsFaulted;
+			}
+
+			ControlStateOperator.Operator.EnableForEncryptionProcess();
 
 			if (Finished != null)
 				Finished(this, EventArgs.Empty);
+
+			if (IsCompleted && Completted != null)
+				Completted(this, EventArgs.Empty);
+
+			if (IsCanceled && Canceled != null)
+				Canceled(this, EventArgs.Empty);
+
+			if (IsFaulted && Faulted != null)
+				Faulted(this, EventArgs.Empty);
 		}
 
-		private void ensureCanceling()
+		private async void deserialize()
 		{
-			//Debug.WriteLine("ensureCanceling()");
+			resetForStart();
 
-			_cancel.Token.ThrowIfCancellationRequested();
+			ControlStateOperator.Operator.DisableForEncryptionProcess();
 
-			//Debug.WriteLine("ensureCanceling.");
-		}
-
-		private async Task serialize()
-		{
-			Debug.WriteLine("serialize()");
-
-			BinaryFormatter formatter = new BinaryFormatter();
-
-			var packBytes = PackData.Serialize(FilePack);
-
-			TotalBytes = 4 + packBytes.Length;
-
-			foreach (var file in FilePack)
-				TotalBytes += file.ByteCount * 5;
-
-			using (FileStream file = new FileStream(FilePath, FileMode.Create))
+			using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Open, ApplicationSettings.Current.Algorithm, PasswordBytes))
 			{
-				BinaryWriter writer = new BinaryWriter(file);
-				writer.Write(packBytes.Length);
+				Encryptor.Processed += Encryptor_Processed;
 
-				progress((int)file.Position, true);
+				var taskLength = Task.Run(() => Encryptor.ReadAsync());
+				await taskLength;
+				
+				var taskBytes = Task.Run(() => Encryptor.ReadAsync(taskLength.Result));
+				await taskBytes;
 
-				int position = 0;
+				FilePack = PackData.Deserialize(taskBytes.Result);
+				
+				TotalBytes = 4 + taskBytes.Result.LongLength + FilePack.TotalBytes;
 
-				while (position < packBytes.Length)
-				{
-					var length = Crypton.BUFFER_SIZE;
-					var over = position + Crypton.BUFFER_SIZE - packBytes.Length;
+				Task taskFile = null;
 
-					if (over > 0)
-						length -= over;
+				foreach (var file in FilePack)
+					await (taskFile = Task.Run(() => Encryptor.DecryptAsync(Path.Combine(OutputPath, file.Name), file.ByteCount)));
 
-					file.Write(packBytes, position, length);
+				Exception = taskFile.Exception;
 
-					progress(position);
+				IsFinished = true;
 
-					position += Crypton.BUFFER_SIZE;
-				}
-
-				progress(packBytes.Length, true);
-
-				foreach(var fileData in FilePack)
-				{
-					var fileBytes = new byte[fileData.ByteCount];
-
-					position = 0;
-
-					using (var stream = new FileStream(fileData.FullName, FileMode.Open))
-					{
-						while (position < stream.Length)
-						{
-							var length = Crypton.BUFFER_SIZE;
-							var over = position + Crypton.BUFFER_SIZE - (int)stream.Length;
-
-							if (over > 0)
-								length -= over;
-
-							stream.Read(fileBytes, position, length);
-
-							progress(position);
-
-							position += Crypton.BUFFER_SIZE;
-						}
-					}
-
-					progress(fileData.ByteCount, true);
-
-					fileBytes = encryptFile(fileBytes);
-
-					progress(fileData.ByteCount, true);
-
-					position = 0;
-
-					while (position < fileBytes.Length)
-					{
-						var length = Crypton.BUFFER_SIZE;
-						var over = position + Crypton.BUFFER_SIZE - (int)fileBytes.Length;
-
-						if (over > 0)
-							length -= over;
-
-						writer.Write(fileBytes, position, length);
-
-						progress(position);
-
-						position += Crypton.BUFFER_SIZE;
-					}
-
-					progress(fileData.ByteCount, true);
-				}
+				IsCompleted = taskFile.IsCompleted;
+				IsCanceled = taskFile.IsCanceled;
+				IsFaulted = taskFile.IsFaulted;
 			}
 
-			Debug.WriteLine("serialize.");
+			ControlStateOperator.Operator.EnableForEncryptionProcess();
+
+			if (Finished != null)
+				Finished(this, EventArgs.Empty);
+
+			if (IsCompleted && Completted != null)
+				Completted(this, EventArgs.Empty);
+
+			if (IsCanceled && Canceled != null)
+				Canceled(this, EventArgs.Empty);
+
+			if (IsFaulted && Faulted != null)
+				Faulted(this, EventArgs.Empty);
 		}
 
-		private void deserialize()
+		private void encryptorProcessed(int bytesComplitted)
 		{
-			BinaryFormatter formatter = new BinaryFormatter();
-
-			using (FileStream stream = new FileStream(FilePath, FileMode.Open))
+			if (Processed != null)
 			{
-				BinaryReader reader = new BinaryReader(stream);
-				var lengthData = reader.ReadInt32();
+				BytesComplitted += bytesComplitted;
 
-				using (var memoryData = new MemoryStream(reader.ReadBytes(lengthData)))
-				{
-					FilePack = (PackData)formatter.Deserialize(memoryData);
-
-					foreach (var fileData in FilePack)
-					{
-						var fileBytes = reader.ReadBytes(fileData.ByteCount);
-
-						fileBytes = decryptFile(fileBytes);
-
-						using (var file = new FileStream(Path.Combine(OutputPath, fileData.Name), FileMode.Create))
-							file.Write(fileBytes, 0, fileData.ByteCount);
-					}
-				}
-			}
-		}
-
-		private void progress(int byteCount) => progress(byteCount, false);
-
-		private void progress(int byteCount, bool isTotal)
-		{
-			if (isTotal)
-				BytesComplitted = BytesComplitted + byteCount;
-			else
-				CurrentByteComplitted = byteCount;
-
-			var percentage = (int)((BytesComplitted / (decimal)TotalBytes) * 100);
-
-			if (Progress != null && percentage > _lastPercentage)
-			{
-				_lastPercentage = percentage;
-
-				Progress(this, new ProgressEventArgs(percentage, 0));
-			}
-
-			ensureCanceling();
-		}
-
-		private void cryptonProgress(int bytesComplitted)
-		{
-			if (Progress != null)
-			{
-				CurrentByteComplitted = bytesComplitted;
-
-				Progress(this, new ProgressEventArgs((int)((BytesComplitted / TotalBytes) * 100), BytesComplitted));
+				Processed(this, new ValueProcessedEventArgs<int>((int)(BytesComplitted / (decimal)TotalBytes * 100)));
 			}
 		}
 
@@ -339,7 +273,9 @@ namespace Telesyk.SecuredSource
 
 		#region Handlers
 
-		private void Crypton_Progress(object sender, ProgressEventArgs args) => cryptonProgress(args.BytesComplitted);
+		//private void Crypton_Progress(object sender, ProgressEventArgs args) => cryptonProgress(args.Percent);
+
+		private void Encryptor_Processed(object sender, ValueProcessedEventArgs<int> args) => encryptorProcessed(args.Value);
 
 		#endregion
 

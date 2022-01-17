@@ -1,15 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Threading;
-using System.Threading.Tasks;
-
-using Microsoft.Win32;
 
 using Telesyk.Cryptography;
 
@@ -20,11 +14,8 @@ namespace Telesyk.SecuredSource.UI.Controls
 		#region Private declarations
 
 		private IProgress<int> _progress = null;
-
-		private IProgress<int> _finish = null;
-
 		private EncryptionPack _encryptor;
-
+		private TickTimer _timer;
 
 		#endregion
 
@@ -43,9 +34,21 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		public PackData FilePack { get => ControlFiles.FilePack; }
 
+		public IMainWindow Host { get; set; }
+
+		public MoreFeaturesPanelControl Panel => ControlPanel;
+
+		#endregion
+
+		#region Protected properties
+
+		protected int lastPercentage;
+
 		#endregion
 
 		#region Public methods
+
+		public void SetPanelWidth(int width) => setPanelWidth(width);
 
 		#endregion
 
@@ -57,92 +60,99 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			ControlPanel.ControlPassword.PasswordChanged += ControlPassword_PasswordChanged;
-			ControlFiles.FilesChanged += ControlFiles_FilesChanged;
+			ApplicationSettings.Current.AlgorithmChanged += ApplicationSettings_AlgorithmChanged;
+			ApplicationSettings.Current.PasswordChanged += ApplicationSettings_PasswordChanged;
+			ApplicationSettings.Current.FileQuantityChanged += ApplicationSettings_FileQuantityChanged;
+
+			//ControlFiles.FilesChanged += ControlFiles_FilesChanged;
 
 			ColumnPanel.Width = new GridLength(ApplicationSettings.Current.PanelWidth);
 
 			checkStartButton();
+		}
 
-			var lastPercentage = 0;
-
-			_progress = new Progress<int>(percentage =>
+		private void progress(int percentage)
+		{
+			if (percentage > lastPercentage)
 			{
-				if (percentage > lastPercentage)
-				{
-					if (percentage == 100)
-						percentage = 100;
-					
-					lastPercentage = percentage;
+				lastPercentage = percentage;
 
-					Debug.WriteLine($"percentage: {ControlProgress.Value = percentage}");
-				}
-			});
-
-			_finish = new Progress<int>(percentage =>
-			{
-				lastPercentage = 0;
-
-				ControlProgress.Value = percentage;
-				ControlProgress.Visibility = Visibility.Hidden;
-				ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = true);
-			});
+				Debug.WriteLine($"percentage: {ControlProgress.Value = percentage}");
+			}
 		}
 
 		private void checkStartButton()
 		{
-			ButtonStart.IsEnabled = ControlPanel.ControlPassword.PasswordLength == ApplicationSettings.Current.PasswordLength && ControlFiles.FilePack.FileCount > 0;
+			ButtonStart.IsEnabled = ApplicationSettings.Current.PasswordSize.IsValid(ApplicationSettings.Current.PasswordLength) && ControlFiles.FilePack.FileCount > 0;
 		}
 
 		private void saveSplitterWidth()
 		{
-			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth;
+			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth; 
+			
+			Host.SimpleAndFastArea.SetPanelWidth(ApplicationSettings.Current.PanelWidth);
+		}
+
+		private void setPanelWidth(int width)
+		{
+			ColumnPanel.Width = new GridLength(width);
 		}
 
 		private void start()
 		{
-			startAsync();
-		}
-
-		private void startAsync()
-		{
-			Debug.WriteLine("UI.startAsync()");
-
-			EncryptionPack serialize = new EncryptionPack(Path.Combine(ApplicationSettings.Current.Directory, $"{ApplicationSettings.Current.FileName}.$$"), ControlPanel.Password, FilePack);
-			serialize.Finished += Serialize_Finished;
-			serialize.Progress += Serialize_Progress;
+			EncryptionPack serializer = new EncryptionPack(Path.Combine(ApplicationSettings.Current.Directory, $"{ApplicationSettings.Current.FileName}.$$"), ControlPanel.Password, FilePack);
+			serializer.Finished += Serialize_Finished;
+			serializer.Processed += Serialize_Processed;
 
 			ControlProgress.Value = 0;
 			ControlProgress.Visibility = Visibility.Visible;
 			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = false);
 
-			_encryptor = serialize;
+			_encryptor = serializer;
 
-			serialize.Process();
+			_timer = new TickTimer(1000, writeTime);
+			_timer.Start();
 
-			Debug.WriteLine("UI.startAsync.");
+			serializer.Serialize();
 		}
 
-		private void stop()
+		private void writeTime(TickTimer timer)
 		{
-			//try { _encryptor.Cancel(); }
-			//catch { }
-			Debug.WriteLine("UI.stop()");
-			_encryptor.Cancel();
-			Debug.WriteLine("UI.stop.");
+			TextTime.Text = timer.LastTickEllapsed.ToString(@"hh\:mm\:ss");
 		}
+
+		private void finished(int percentage)
+		{
+			_timer.Stop(); 
+			
+			lastPercentage = 0;
+
+			TextTime.Text = null;
+
+			ControlProgress.Value = percentage;
+			ControlProgress.Visibility = Visibility.Hidden;
+			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = true);
+
+			if (_encryptor.IsFaulted)
+				for (var i = 0; i < _encryptor.Exception.InnerExceptions.Count; i++)
+					MessageBox.Show(_encryptor.Exception.InnerExceptions[i].Message, _encryptor.Exception.InnerExceptions[i].GetType().Name);
+		}
+
+		private void stop() => _encryptor.Cancel();
 
 		#region Handlers
 
-		private void ControlPassword_PasswordChanged(object sender, EventArgs e) => checkStartButton();
+		private void ApplicationSettings_PasswordChanged(object sender, EventArgs e) => checkStartButton();
 
-		private void ControlFiles_FilesChanged(object sender, EventArgs e) => checkStartButton();
+		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e) => checkStartButton();
+
+		private void ApplicationSettings_FileQuantityChanged(object sender, EventArgs e) => checkStartButton();
 
 		private void Splitter_DragCompleted(object sender, DragCompletedEventArgs e) => saveSplitterWidth();
 
-		private void Serialize_Finished(object sender, EventArgs e) => _finish.Report(0);
+		private void Serialize_Finished(object sender, EventArgs e) => finished(100);
 
-		private void Serialize_Progress(object sender, ProgressEventArgs e) => _progress.Report(e.Percentage);
+		private void Serialize_Processed(object sender, ValueProcessedEventArgs<int> args) =>  progress(args.Value);
 
 		private void ButtonStop_Click(object sender, RoutedEventArgs e) => stop();
 

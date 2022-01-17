@@ -1,6 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Version xmlns="">1.0.1</Version>
+  </Import>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -58,8 +59,16 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Panel.xaml.cs">
-      <DependentUpon>Panel.xaml</DependentUpon>
+    <Compile Include="ControlMode.cs" />
+    <Compile Include="IMainWindow.cs" />
+    <Compile Include="SelectFile.xaml.cs">
+      <DependentUpon>SelectFile.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SimpleAndFastPanel.xaml.cs">
+      <DependentUpon>SimpleAndFastPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MoreFeaturesPanel.xaml.cs">
+      <DependentUpon>MoreFeaturesPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="DESPanel.xaml.cs">
       <DependentUpon>DESPanel.xaml</DependentUpon>
@@ -88,6 +97,9 @@
     <Compile Include="RC5Panel.xaml.cs">
       <DependentUpon>RC5Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SelectAlgorithm.xaml.cs">
+      <DependentUpon>SelectAlgorithm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SelectDirectory.xaml.cs">
       <DependentUpon>SelectDirectory.xaml</DependentUpon>
     </Compile>
@@ -106,7 +118,15 @@
     <Compile Include="SimpleAndFast.xaml.cs">
       <DependentUpon>SimpleAndFast.xaml</DependentUpon>
     </Compile>
-    <Page Include="Panel.xaml">
+    <Page Include="SelectFile.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SimpleAndFastPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MoreFeaturesPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -143,6 +163,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RC5Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SelectAlgorithm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -186,6 +210,10 @@
     <ProjectReference Include="..\..\..\Components\Crypton\Solution\Crypton\Crypton.csproj">
       <Project>{f9610d8c-d083-463b-896f-d87cf1b31e6f}</Project>
       <Name>Crypton</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Components\Utils\Solution\Utils\Utils.csproj">
+      <Project>{55f6caa8-6338-4db7-b9ec-c0f25e4a2799}</Project>
+      <Name>Utils</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{dd829222-ac76-41f9-9e5b-9af9a2bd1cf8}</Project>

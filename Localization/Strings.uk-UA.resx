@@ -123,7 +123,7 @@
   <data name="AddFiles" xml:space="preserve">
     <value>Додати файли</value>
   </data>
-  <data name="Algorythm" xml:space="preserve">
+  <data name="Algorithm" xml:space="preserve">
     <value>Алгоритм</value>
   </data>
   <data name="Browse" xml:space="preserve">
@@ -138,8 +138,14 @@
   <data name="DeselectAll" xml:space="preserve">
     <value>Скасувати виділення для всіх файлів</value>
   </data>
-  <data name="Directory" xml:space="preserve">
-    <value>Папка</value>
+  <data name="DoDecrypt" xml:space="preserve">
+    <value>Розшифрувати</value>
+  </data>
+  <data name="DoEncrypt" xml:space="preserve">
+    <value>Зашифрувати</value>
+  </data>
+  <data name="EncryptedFile" xml:space="preserve">
+    <value>Зашифрований файл</value>
   </data>
   <data name="FileName" xml:space="preserve">
     <value>Ім'я файлу</value>
@@ -168,14 +174,23 @@
   <data name="PasswordToolTip" xml:space="preserve">
     <value>Це гасло буде використано як ключ шифрування</value>
   </data>
+  <data name="ReadArchive" xml:space="preserve">
+    <value>Зчитати архів</value>
+  </data>
   <data name="RequiredQuantity" xml:space="preserve">
     <value>необхідно</value>
+  </data>
+  <data name="SaveDirectory" xml:space="preserve">
+    <value>Зберегти у</value>
   </data>
   <data name="SelectAll" xml:space="preserve">
     <value>Виділити усі файли</value>
   </data>
   <data name="Selected" xml:space="preserve">
     <value>вибрано</value>
+  </data>
+  <data name="SelectFile" xml:space="preserve">
+    <value>Вибрати файл</value>
   </data>
   <data name="SelectSavingDirectory" xml:space="preserve">
     <value>Будь ласка оберіть діректорію для збереження зашифрованого пакету.</value>
@@ -197,5 +212,8 @@
   </data>
   <data name="Title" xml:space="preserve">
     <value>Secured Source</value>
+  </data>
+  <data name="UploadDirectory" xml:space="preserve">
+    <value>Вивантажити у</value>
   </data>
 </root>

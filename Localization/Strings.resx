@@ -123,7 +123,7 @@
   <data name="AddFiles" xml:space="preserve">
     <value>Add</value>
   </data>
-  <data name="Algorythm" xml:space="preserve">
+  <data name="Algorithm" xml:space="preserve">
     <value>Algorythm</value>
   </data>
   <data name="Browse" xml:space="preserve">
@@ -138,8 +138,14 @@
   <data name="DeselectAll" xml:space="preserve">
     <value>Deselect all files</value>
   </data>
-  <data name="Directory" xml:space="preserve">
-    <value>Directory</value>
+  <data name="DoDecrypt" xml:space="preserve">
+    <value>Decrypt</value>
+  </data>
+  <data name="DoEncrypt" xml:space="preserve">
+    <value>Encrypt</value>
+  </data>
+  <data name="EncryptedFile" xml:space="preserve">
+    <value>Encrypted file</value>
   </data>
   <data name="FileName" xml:space="preserve">
     <value>File name</value>
@@ -171,14 +177,23 @@
   <data name="PasswordToolTip" xml:space="preserve">
     <value>This password will be used as encryption key</value>
   </data>
+  <data name="ReadArchive" xml:space="preserve">
+    <value>Read Archive</value>
+  </data>
   <data name="RequiredQuantity" xml:space="preserve">
     <value>required</value>
+  </data>
+  <data name="SaveDirectory" xml:space="preserve">
+    <value>SateTo</value>
   </data>
   <data name="SelectAll" xml:space="preserve">
     <value>Select all files</value>
   </data>
   <data name="Selected" xml:space="preserve">
     <value>selected</value>
+  </data>
+  <data name="SelectFile" xml:space="preserve">
+    <value>Select file</value>
   </data>
   <data name="SelectSavingDirectory" xml:space="preserve">
     <value>Please select directory to save encrypted package.</value>
@@ -200,5 +215,8 @@
   </data>
   <data name="Title" xml:space="preserve">
     <value>Secured Source</value>
+  </data>
+  <data name="UploadDirectory" xml:space="preserve">
+    <value>UploadTo</value>
   </data>
 </root>

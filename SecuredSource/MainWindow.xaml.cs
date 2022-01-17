@@ -9,7 +9,7 @@ using Telesyk.SecuredSource.UI.Controls;
 
 namespace Telesyk.SecuredSource.UI
 {
-	public partial class MainWindow : Window
+	public partial class MainWindow : Window, IMainWindow
 	{
 		#region Private declarations
 
@@ -36,9 +36,13 @@ namespace Telesyk.SecuredSource.UI
 			private set { ensureMode(value); }
 		}
 
-		public SimpleAndFastAreaControl SimpleAndFastControl { get; private set; } = new SimpleAndFastAreaControl();
+		public SimpleAndFastPanelControl SimpleAndFastPanel { get; private set; }
 
-		public MoreFeaturesAreaControl MoreFeaturesControl { get; private set; } = new MoreFeaturesAreaControl();
+		public SimpleAndFastAreaControl SimpleAndFastArea { get; private set; } = new SimpleAndFastAreaControl();
+
+		public MoreFeaturesPanelControl MoreFeaturesPanel { get; private set; }
+
+		public MoreFeaturesAreaControl MoreFeaturesArea { get; private set; } = new MoreFeaturesAreaControl();
 
 		#endregion
 
@@ -48,6 +52,12 @@ namespace Telesyk.SecuredSource.UI
 		{
 			Mode = ApplicationSettings.Current.Mode;
 
+			SimpleAndFastPanel = SimpleAndFastArea.Panel;
+			MoreFeaturesPanel = MoreFeaturesArea.Panel;
+
+			SimpleAndFastArea.Host = this;
+			MoreFeaturesArea.Host = this;
+
 			var textVersion = ((Run)FindName("textVersion"));
 			textVersion.ToolTip = textVersion.Text = ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false)[0]).Version;
 
@@ -55,6 +65,8 @@ namespace Telesyk.SecuredSource.UI
 			Height = ApplicationSettings.Current.WindowHeight;
 			Top = ApplicationSettings.Current.WindowTop;
 			Left = ApplicationSettings.Current.WindowLeft;
+
+			ControlStateOperator.Operator.RegisterForEncryptionProcess(RadioMoreFeatures, RadioSimpleAndFast);
 		}
 
 		private void ensureMode(ApplicationMode mode)
@@ -81,10 +93,10 @@ namespace Telesyk.SecuredSource.UI
 			switch(Mode)
 			{
 				case ApplicationMode.SimpleAndFast:
-					controlArea = SimpleAndFastControl;
+					controlArea = SimpleAndFastArea;
 					break;
 				case ApplicationMode.MoreFeatures:
-					controlArea = MoreFeaturesControl;
+					controlArea = MoreFeaturesArea;
 					break;
 			}
 

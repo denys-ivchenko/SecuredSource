@@ -12,8 +12,8 @@ namespace Telesyk.SecuredSource.UI.Controls
 	{
 		#region Private declarations
 
-		private string _password = null;
 		private bool _skipChange = false;
+		private ControlMode _mode = ControlMode.Encrypt;
 
 		#endregion
 
@@ -30,21 +30,20 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public properties
 
-		public int PasswordLength { get; private set; }
-
 		public bool IsPasswordVisible { get; private set; }
 
-		public string Password
-		{
-			get { return _password; }
-			private set { TextValue.Text = value; }
+		public string Password { get; private set; }
+
+		public ControlMode Mode 
+		{ 
+			get => _mode; 
+			set
+			{
+				_mode = value;
+
+				ensureMode();
+			}
 		}
-
-		#endregion
-
-		#region Events
-
-		public event EventHandler PasswordChanged;
 
 		#endregion
 
@@ -52,48 +51,59 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			TextValue.MaxLength = PasswordValue.MaxLength = ApplicationSettings.Current.PasswordLength;
-
-			setCurrentPasswordLength();
-			setRequiredPasswordLength();
-
-			ApplicationSettings.Current.AlgorythmChanged += ApplicationSettings_AlgorythmChanged;
+			ControlStateOperator.Operator.RegisterForEncryptionProcess(PasswordValue, TextValue);
 		}
 
-		private void setCurrentPasswordLength()
-		{	
-			TextQuantity.Text = $"{PasswordLength = (Password ?? string.Empty).Length}";
-
-			if (PasswordChanged != null)
-				PasswordChanged(this, EventArgs.Empty);
-		}
-
-		private void setRequiredPasswordLength()
+		private void ensureMode ()
 		{
-			TextRequired.Text = $"{TextValue.MaxLength = PasswordValue.MaxLength = ApplicationSettings.Current.PasswordLength}";
-		}
+			displayCurrentPasswordLength();
 
-		private void passwordValueChanged()
-		{
-			if (!_skipChange)
+			if (Mode == ControlMode.Encrypt)
 			{
-				_skipChange = true;
-				_password = TextValue.Text = PasswordValue.Password;
+				TextValue.MaxLength = PasswordValue.MaxLength = ApplicationSettings.Current.RequiredPasswordLength;
 
-				setCurrentPasswordLength();
+				displayRequiredPasswordLength();
+
+				ApplicationSettings.Current.AlgorithmChanged += ApplicationSettings_AlgorithmChanged;
 			}
 			else
-				_skipChange = false;
+			{
+				ApplicationSettings.Current.AlgorithmChanged -= ApplicationSettings_AlgorithmChanged;
+
+				TextValue.MaxLength = PasswordValue.MaxLength = 32;
+				TextLengthSeparator.Text = TextRequiredLength.Text = null;
+			}
 		}
 
-		private void textValueChanged()
+		private void displayCurrentPasswordLength()
+		{	
+			TextLength.Text = $"{(Password ?? string.Empty).Length}";
+		}
+
+		private void displayRequiredPasswordLength()
+		{
+			TextValue.MaxLength = PasswordValue.MaxLength = ApplicationSettings.Current.PasswordSize.MaxSize;
+			TextRequiredLength.Text = null;
+
+			if (ApplicationSettings.Current.PasswordSize.Skip != 1)
+				for (var i = 0; i < ApplicationSettings.Current.PasswordSize.Quantity; i++)
+					TextRequiredLength.Text += $"{(i > 0 ? "," : null)}{ApplicationSettings.Current.PasswordSize[i]}";
+			else
+				TextRequiredLength.Text = $"{ApplicationSettings.Current.PasswordSize.MinSize}-{ApplicationSettings.Current.PasswordSize.MaxSize}";
+		}
+
+		private void setPassword(Func<string> func)
 		{
 			if (!_skipChange)
 			{
 				_skipChange = true;
-				_password = PasswordValue.Password = TextValue.Text;
 
-				setCurrentPasswordLength();
+				Password = func();
+				
+				displayCurrentPasswordLength();
+
+				if (Mode == ControlMode.Encrypt)
+					ApplicationSettings.Current.PasswordLength = Password.Length;
 			}
 			else
 				_skipChange = false;
@@ -119,13 +129,13 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Handlers
 
-		private void Password_PasswordChanged(object sender, RoutedEventArgs e) => passwordValueChanged();
+		private void Password_PasswordChanged(object sender, RoutedEventArgs e) => setPassword(() => TextValue.Text = PasswordValue.Password);
 
-		private void TextValue_TextChanged(object sender, TextChangedEventArgs e) => textValueChanged();
+		private void TextValue_TextChanged(object sender, TextChangedEventArgs e) => setPassword(() => PasswordValue.Password = TextValue.Text);
 
 		private void ImageVisibility_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => passwordVisibilityChanged();
 
-		private void ApplicationSettings_AlgorythmChanged(object sender, EventArgs e) => setRequiredPasswordLength();
+		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e) => displayRequiredPasswordLength();
 
 		#endregion
 

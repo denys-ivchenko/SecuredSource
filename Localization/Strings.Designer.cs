@@ -81,9 +81,9 @@ namespace Telesyk.SecuredSource.Globalization {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Algorythm.
         /// </summary>
-        public static string Algorythm {
+        public static string Algorithm {
             get {
-                return ResourceManager.GetString("Algorythm", resourceCulture);
+                return ResourceManager.GetString("Algorithm", resourceCulture);
             }
         }
         
@@ -124,11 +124,29 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Directory.
+        ///   Ищет локализованную строку, похожую на Decrypt.
         /// </summary>
-        public static string Directory {
+        public static string DoDecrypt {
             get {
-                return ResourceManager.GetString("Directory", resourceCulture);
+                return ResourceManager.GetString("DoDecrypt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Encrypt.
+        /// </summary>
+        public static string DoEncrypt {
+            get {
+                return ResourceManager.GetString("DoEncrypt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Encrypted file.
+        /// </summary>
+        public static string EncryptedFile {
+            get {
+                return ResourceManager.GetString("EncryptedFile", resourceCulture);
             }
         }
         
@@ -223,11 +241,29 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Read Archive.
+        /// </summary>
+        public static string ReadArchive {
+            get {
+                return ResourceManager.GetString("ReadArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на required.
         /// </summary>
         public static string RequiredQuantity {
             get {
                 return ResourceManager.GetString("RequiredQuantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SateTo.
+        /// </summary>
+        public static string SaveDirectory {
+            get {
+                return ResourceManager.GetString("SaveDirectory", resourceCulture);
             }
         }
         
@@ -246,6 +282,15 @@ namespace Telesyk.SecuredSource.Globalization {
         public static string Selected {
             get {
                 return ResourceManager.GetString("Selected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select file.
+        /// </summary>
+        public static string SelectFile {
+            get {
+                return ResourceManager.GetString("SelectFile", resourceCulture);
             }
         }
         
@@ -309,6 +354,15 @@ namespace Telesyk.SecuredSource.Globalization {
         public static string Title {
             get {
                 return ResourceManager.GetString("Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на UploadTo.
+        /// </summary>
+        public static string UploadDirectory {
+            get {
+                return ResourceManager.GetString("UploadDirectory", resourceCulture);
             }
         }
     }

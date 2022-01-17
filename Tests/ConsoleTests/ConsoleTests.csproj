@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="runtime.native.System.IO.Compression" Version="4.1.0" />
     <PackageReference Include="runtime.native.System.Net.Http" Version="4.0.1" />
   </ItemGroup>
 
@@ -13,6 +14,12 @@
     <ProjectReference Include="..\..\..\..\Components\Crypton\Solution\Crypton\Crypton.csproj" />
     <ProjectReference Include="..\..\Controls\Controls.csproj" />
     <ProjectReference Include="..\..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Drawing.Common">
+      <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\5.0.4\System.Drawing.Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
