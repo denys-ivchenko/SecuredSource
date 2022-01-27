@@ -14,8 +14,11 @@ namespace Telesyk.SecuredSource
 
 		private static Lazy<ControlStateOperator> _operator = new Lazy<ControlStateOperator>(() => new ControlStateOperator());
 
-		private List<UIElement> _controls = new List<UIElement>();
-		private List<IEnablingState> _containers = new List<IEnablingState>();
+		private List<UIElement> _encryptionControls = new List<UIElement>();
+		private List<IEnablingState> _encryptionContainers = new List<IEnablingState>();
+
+		//private List<UIElement> _decryptionControls = new List<UIElement>();
+		//private List<IEnablingState> _decryptionContainers = new List<IEnablingState>();
 
 		#endregion
 
@@ -42,6 +45,10 @@ namespace Telesyk.SecuredSource
 
 		public void UnregisterForEncryptionProcess(params UIElement[] controls) => unregisterForEncryptionProcess(controls);
 
+		//public void RegisterForDecryptionProcess(params UIElement[] controls) => registerForDecryptionProcess(controls);
+
+		//public void UnregisterForDecryptionProcess(params UIElement[] controls) => unregisterForDecryptionProcess(controls);
+
 		//public void RegisterForEncriptionProcess(IEnablingState container) => registerForEncriptionProcess(container);
 
 		#endregion
@@ -52,6 +59,10 @@ namespace Telesyk.SecuredSource
 
 		internal void EnableForEncryptionProcess() => enableForEncryptionProcess();
 
+		//internal void DisableForDecryptionProcess() => disableForDecryptionProcess();
+
+		//internal void EnableForDecryptionProcess() => enableForDecryptionProcess();
+
 		#endregion
 
 		#region Private methods
@@ -59,36 +70,70 @@ namespace Telesyk.SecuredSource
 		private void registerForEncryptionProcess(params UIElement[] controls)
 		{
 			foreach(var control in controls)
-				if (control is IEnablingState && !_containers.Contains(control as IEnablingState))
-					_containers.Add(control as IEnablingState);
-				else if (!(control is IEnablingState) && !_controls.Contains(control))
-					_controls.Add(control);
+				if (control is IEnablingState && !_encryptionContainers.Contains(control as IEnablingState))
+					_encryptionContainers.Add(control as IEnablingState);
+				else if (!(control is IEnablingState) && !_encryptionControls.Contains(control))
+					_encryptionControls.Add(control);
 		}
 
 		private void unregisterForEncryptionProcess(params UIElement[] controls)
 		{
 			foreach (var control in controls)
-				if (_containers.Contains(control as IEnablingState))
-					_containers.Remove(control as IEnablingState);
-				else if (_controls.Contains(control))
-					_controls.Remove(control);
+				if (_encryptionContainers.Contains(control as IEnablingState))
+					_encryptionContainers.Remove(control as IEnablingState);
+				else if (_encryptionControls.Contains(control))
+					_encryptionControls.Remove(control);
 		}
 
 		private void disableForEncryptionProcess()
 		{
-			_controls.ForEach(c => c.IsEnabled = false);
-			_containers.ForEach(c => c.SetEnablingState(true));
+			_encryptionControls.ForEach(c => c.IsEnabled = false);
+			_encryptionContainers.ForEach(c => c.SetEnablingState(true));
 
 			IsInProcess = true;
 		}
 
 		private void enableForEncryptionProcess()
 		{
-			_controls.ForEach(c => c.IsEnabled = true);
-			_containers.ForEach(c => c.SetEnablingState(false));
+			_encryptionControls.ForEach(c => c.IsEnabled = true);
+			_encryptionContainers.ForEach(c => c.SetEnablingState(false));
 
 			IsInProcess = false;
 		}
+
+		//private void registerForDecryptionProcess(params UIElement[] controls)
+		//{
+		//	foreach(var control in controls)
+		//		if (control is IEnablingState && !_decryptionContainers.Contains(control as IEnablingState))
+		//			_decryptionContainers.Add(control as IEnablingState);
+		//		else if (!(control is IEnablingState) && !_decryptionControls.Contains(control))
+		//			_decryptionControls.Add(control);
+		//}
+
+		//private void unregisterForDecryptionProcess(params UIElement[] controls)
+		//{
+		//	foreach (var control in controls)
+		//		if (_decryptionContainers.Contains(control as IEnablingState))
+		//			_decryptionContainers.Remove(control as IEnablingState);
+		//		else if (_decryptionControls.Contains(control))
+		//			_decryptionControls.Remove(control);
+		//}
+
+		//private void disableForDecryptionProcess()
+		//{
+		//	_decryptionControls.ForEach(c => c.IsEnabled = false);
+		//	_decryptionContainers.ForEach(c => c.SetEnablingState(true));
+
+		//	IsInProcess = true;
+		//}
+
+		//private void enableForDecryptionProcess()
+		//{
+		//	_decryptionControls.ForEach(c => c.IsEnabled = true);
+		//	_decryptionContainers.ForEach(c => c.SetEnablingState(false));
+
+		//	IsInProcess = false;
+		//}
 
 		#endregion
 	}

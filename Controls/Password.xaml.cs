@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-using System.Threading;
 using System.Threading.Tasks;
+
+using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
@@ -13,7 +15,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 		#region Private declarations
 
 		private bool _skipChange = false;
-		private ControlMode _mode = ControlMode.Encrypt;
 
 		#endregion
 
@@ -34,16 +35,21 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		public string Password { get; private set; }
 
-		public ControlMode Mode 
-		{ 
-			get => _mode; 
-			set
-			{
-				_mode = value;
+		public byte[] PasswordBytes { get; private set; }
 
-				ensureMode();
-			}
-		}
+		public byte[] PasswordHashBytes { get; private set; }
+
+		public string PasswordHash { get; private set; }
+
+		public ApplicationMode Mode { get; set; }
+
+		#endregion
+
+		#region Public events
+
+		public event ValueProcessedEventHandler<string> PasswordChanged;
+
+		public event ValueProcessedEventHandler<string> PasswordHashChanged;
 
 		#endregion
 
@@ -54,11 +60,18 @@ namespace Telesyk.SecuredSource.UI.Controls
 			ControlStateOperator.Operator.RegisterForEncryptionProcess(PasswordValue, TextValue);
 		}
 
+		public override void OnApplyTemplate()
+		{
+			base.OnApplyTemplate();
+
+			ensureMode();
+		}
+
 		private void ensureMode ()
 		{
 			displayCurrentPasswordLength();
 
-			if (Mode == ControlMode.Encrypt)
+			if (Mode == ApplicationMode.Encryption)
 			{
 				TextValue.MaxLength = PasswordValue.MaxLength = ApplicationSettings.Current.RequiredPasswordLength;
 
@@ -68,8 +81,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 			}
 			else
 			{
-				ApplicationSettings.Current.AlgorithmChanged -= ApplicationSettings_AlgorithmChanged;
-
 				TextValue.MaxLength = PasswordValue.MaxLength = 32;
 				TextLengthSeparator.Text = TextRequiredLength.Text = null;
 			}
@@ -99,11 +110,18 @@ namespace Telesyk.SecuredSource.UI.Controls
 				_skipChange = true;
 
 				Password = func();
-				
+
+				PasswordBytes = Encoding.UTF8.GetBytes(Password);
+				PasswordHashBytes = SymmetricEncryptor.ComputeHash(PasswordBytes);
+				PasswordHash = Convert.ToBase64String(PasswordBytes);
+
 				displayCurrentPasswordLength();
 
-				if (Mode == ControlMode.Encrypt)
+				if (Mode == ApplicationMode.Encryption)
 					ApplicationSettings.Current.PasswordLength = Password.Length;
+
+				PasswordChanged?.Invoke(this, new ValueProcessedEventArgs<string>(Password));
+				PasswordHashChanged?.Invoke(this, new ValueProcessedEventArgs<string>(PasswordHash));
 			}
 			else
 				_skipChange = false;

@@ -15,59 +15,51 @@ namespace Telesyk.SecuredSource
 		#region Private declarations
 
 		private long _totalByteComplitted;
+		private string _password;
 
 		#endregion
 
 		#region Constructors
 
-		private EncryptionPack(string filePath, string password, EncryptedPackMode mode)
+		private EncryptionPack(string filePath, string password, ApplicationMode mode, PackData filePackData, string outputPath)
 		{
 			FilePath = filePath;
-			Password = password;
 			Mode = mode;
+			OutputPath = outputPath;
+			FilePack = filePackData;
+			PasswordBytes = Encoding.UTF8.GetBytes(password);
 
 			init();
 		}
 
 		public EncryptionPack(string filePath, string password, PackData filePackData)
-			: this(filePath, password, EncryptedPackMode.Serialize)
+			: this(filePath, password, ApplicationMode.Encryption, filePackData, null)
 		{
-			FilePack = filePackData;
+			
 		}
 
 		public EncryptionPack(string filePath, string password, string outputPath)
-			: this(filePath, password, EncryptedPackMode.Deserialize)
+			: this(filePath, password, ApplicationMode.Decryption, null, outputPath)
 		{
-			OutputPath = outputPath;
 		}
 
 		#endregion
 
 		#region Public properties
 
-		public EncryptedPackMode Mode { get; private set; }
-
-		public string FilePath { get; private set; }
-
-		public string Password { get; private set; }
-
-		public string OutputPath { get; private set; }
-
-		public byte[] PasswordBytes { get; private set; }
+		public ApplicationMode Mode { get; private set; }
 
 		public PackData FilePack { get; private set; }
 
-		public long TotalBytes { get; private set; }
+		public string FilePath { get; private set; }
 
-		public long BytesComplitted
-		{
-			get => _totalByteComplitted + CurrentByteComplitted;
-			private set
-			{
-				_totalByteComplitted = value;
-				CurrentByteComplitted = 0;
-			}
-		}
+		public byte[] PasswordBytes { get; private set; }
+	
+		public string PasswordHash { get; private set; }
+
+		public string OutputPath { get; private set; }
+
+		public long TotalBytes { get; private set; }
 
 		public AggregateException Exception { get; private set; }
 
@@ -80,6 +72,19 @@ namespace Telesyk.SecuredSource
 		public bool IsCanceled { get; private set; }
 
 		public bool IsFaulted { get; private set; }
+
+		public bool IsValid { get; private set; }
+
+		public long BytesComplitted
+		{
+			get => _totalByteComplitted + CurrentByteComplitted;
+			private set
+			{
+				_totalByteComplitted = value;
+
+				CurrentByteComplitted = 0;
+			}
+		}
 
 		#endregion
 
@@ -128,11 +133,8 @@ namespace Telesyk.SecuredSource
 
 		private void init()
 		{
-			PasswordBytes = Encoding.UTF8.GetBytes(Password);
-
-			if (Mode == EncryptedPackMode.Deserialize)
-				using (FileStream stream = new FileStream(FilePath, FileMode.Open))
-					TotalBytes = (int)stream.Length;
+			if (PasswordBytes != null)
+				PasswordHash = Convert.ToBase64String(PasswordBytes);
 		}
 
 		private void resetForStart()
@@ -147,6 +149,28 @@ namespace Telesyk.SecuredSource
 
 			if (encryptor != null && !encryptor.IsCanceled)
 				encryptor.Cancel();
+		}
+
+		private void readMetaData()
+		{
+			try
+			{
+				using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Open, ApplicationSettings.Current.DecryptionAlgorithm, PasswordBytes))
+				{
+					Encryptor.Processed += Encryptor_Processed;
+
+					var length = Encryptor.Read();
+
+					byte[] bytes = Encryptor.Read(length);
+
+					FilePack = PackData.Deserialize(bytes);
+
+					TotalBytes = 4 + bytes.Length + FilePack.TotalBytes;
+
+					IsValid = true;
+				}
+			}
+			catch { }
 		}
 
 		private async void serialize()
@@ -202,7 +226,7 @@ namespace Telesyk.SecuredSource
 
 			ControlStateOperator.Operator.DisableForEncryptionProcess();
 
-			using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Open, ApplicationSettings.Current.Algorithm, PasswordBytes))
+			using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Open, ApplicationSettings.Current.DecryptionAlgorithm, PasswordBytes))
 			{
 				Encryptor.Processed += Encryptor_Processed;
 
@@ -255,39 +279,11 @@ namespace Telesyk.SecuredSource
 			}
 		}
 
-		private byte[] encryptFile(byte[] fileBytes)
-		{
-			Crypton.Instance.GenerateAesKey();
-			Crypton.Instance.AesKey = PasswordBytes;
-
-			return Crypton.Instance.EncryptByAes(fileBytes);
-		}
-
-		private byte[] decryptFile(byte[] fileBytes)
-		{
-			Crypton.Instance.GenerateAesKey();
-			Crypton.Instance.AesKey = PasswordBytes;
-
-			return Crypton.Instance.DecryptByAes(fileBytes);
-		}
-
 		#region Handlers
-
-		//private void Crypton_Progress(object sender, ProgressEventArgs args) => cryptonProgress(args.Percent);
 
 		private void Encryptor_Processed(object sender, ValueProcessedEventArgs<int> args) => encryptorProcessed(args.Value);
 
 		#endregion
-
-		#endregion
-
-		#region Enum EncryptedPackMode
-
-		public enum EncryptedPackMode
-		{
-			Serialize,
-			Deserialize
-		}
 
 		#endregion
 	}

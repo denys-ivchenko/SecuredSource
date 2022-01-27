@@ -14,7 +14,7 @@
 				<StackPanel x:Name="PanelFiles" />
 			</ScrollViewer>
 		</Border>
-		<Grid Style="{StaticResource Test}">
+		<Grid x:Name="GridCommands" Style="{StaticResource Test}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="50"/>
 				<ColumnDefinition Width="*" />
@@ -30,5 +30,8 @@
 			</StackPanel>
 			<TextBlock Grid.Column="2" Style="{StaticResource FileCountContainer}"><Run Text="{x:Static res:Strings.OfFiles}" />: <Run x:Name="TextFileCount" Text="0" Style="{StaticResource FileCount}" />, <Run Text="{x:Static res:Strings.Selected}" />: <Run x:Name="TextSelectedFileCount" Text="0" Style="{StaticResource FileCount}" /></TextBlock>
 		</Grid>
+		<StackPanel x:Name="PanelDecryptionFileCount" Orientation="Horizontal" Visibility="Collapsed">
+			<TextBlock Style="{StaticResource FileCountContainer}"><Run Text="{x:Static res:Strings.OfFiles}" />: <Run x:Name="TextDecryptionFileCount" Text="0" Style="{StaticResource FileCount}" /></TextBlock>
+		</StackPanel>
 	</StackPanel>
 </UserControl>

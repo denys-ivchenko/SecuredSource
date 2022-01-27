@@ -172,6 +172,10 @@
     <Resource Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Components\Utils\Solution\Utils\Utils.csproj">
+      <Project>{55f6caa8-6338-4db7-b9ec-c0f25e4a2799}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Controls\Controls.csproj">
       <Project>{5446b23b-eba9-48ac-9c0d-ad4d0df178ba}</Project>
       <Name>Controls</Name>
@@ -185,14 +189,7 @@
       <Name>Localization</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <FileAssociation Include=".%24%24">
-      <Visible>False</Visible>
-      <Description>Encrypted file by Secured Source</Description>
-      <Progid>SecuredSource</Progid>
-      <DefaultIcon>app.ico</DefaultIcon>
-    </FileAssociation>
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\add.gif" />
   </ItemGroup>

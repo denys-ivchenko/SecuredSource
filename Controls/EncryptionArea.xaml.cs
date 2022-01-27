@@ -9,7 +9,7 @@ using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
-	public partial class MoreFeaturesAreaControl : UserControl
+	public partial class EncryptionAreaControl : UserControl
 	{
 		#region Private declarations
 
@@ -21,7 +21,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Constructors
 
-		public MoreFeaturesAreaControl()
+		public EncryptionAreaControl()
 		{
 			InitializeComponent();
 
@@ -36,7 +36,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		public IMainWindow Host { get; set; }
 
-		public MoreFeaturesPanelControl Panel => ControlPanel;
+		public EncryptionPanelControl Panel => ControlPanel;
 
 		#endregion
 
@@ -90,7 +90,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 		{
 			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth; 
 			
-			Host.SimpleAndFastArea.SetPanelWidth(ApplicationSettings.Current.PanelWidth);
+			Host.DecryptionArea.SetPanelWidth(ApplicationSettings.Current.PanelWidth);
 		}
 
 		private void setPanelWidth(int width)
@@ -142,9 +142,19 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Handlers
 
-		private void ApplicationSettings_PasswordChanged(object sender, EventArgs e) => checkStartButton();
+		private void ApplicationSettings_PasswordChanged(object sender, EventArgs e)
+		{
+			FilePack.PasswordHash = Panel.PasswordHash;
 
-		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e) => checkStartButton();
+			checkStartButton();
+		}
+
+		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e)
+		{
+			FilePack.Algorithm = ApplicationSettings.Current.Algorithm;
+
+			checkStartButton();
+		}
 
 		private void ApplicationSettings_FileQuantityChanged(object sender, EventArgs e) => checkStartButton();
 

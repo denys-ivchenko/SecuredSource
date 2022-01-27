@@ -34,6 +34,8 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		public PackData FilePack { get; } = new PackData();
 
+		public ApplicationMode Mode { get; set; } = ApplicationMode.Encryption;
+
 		internal bool IsMouseButtonTakeDawn { get; private set; }
 
 		#endregion
@@ -44,36 +46,19 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#endregion
 
-		#region Events
-
-		//public event EventHandler FilesChanged;
-
-		#endregion
-
 		#region Private methods
 
-		private void init()
-		{
-			ControlStateOperator.Operator.RegisterForEncryptionProcess(this);
-		}
+		private void init() => ControlStateOperator.Operator.RegisterForEncryptionProcess(this);
 
-		private void checkDeleteButtonStyleAndState()
-		{
-			//ButtonFileDelete.Style = (Style)FindResource($"FileButtonDelete{(_selectedFiles.Count == 0 ? "Disabled" : null)}");
-			//ButtonFileDelete.IsEnabled = _selectedFiles.Count > 0;
+		public override void OnApplyTemplate() => checkControlsEnablingByMode();
 
-			setButtonEnablingState(ButtonFileDelete, "Delete", _selectedFiles.Count == 0);
-		}
+		private void checkControlsEnablingByMode() => GridCommands.Visibility = Mode == ApplicationMode.Encryption ? Visibility.Visible : Visibility.Collapsed;
+
+		private void checkDeleteButtonStyleAndState() => setButtonEnablingState(ButtonFileDelete, "Delete", _selectedFiles.Count == 0);
 
 		private void checkAllSelectableButtonsState()
 		{
-			//ButtonFileDeselectAll.Style = (Style)FindResource($"FileButtonDeselectAll{(_selectedFiles.Count == 0 ? "Disabled" : null)}");
-			//ButtonFileDeselectAll.IsEnabled = _selectedFiles.Count > 0;
-
 			setButtonEnablingState(ButtonFileDeselectAll, "DeselectAll", _selectedFiles.Count == 0);
-
-			//ButtonFileSelectAll.Style = (Style)FindResource($"FileButtonSelectAll{(_selectedFiles.Count == FilePack.FileCount ? "Disabled" : null)}");
-			//ButtonFileSelectAll.IsEnabled = _selectedFiles.Count < FilePack.FileCount;
 
 			setButtonEnablingState(ButtonFileSelectAll, "SelectAll", _selectedFiles.Count == FilePack.FileCount);
 		}
@@ -121,9 +106,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 			checkAllSelectableButtonsState();
 
 			ApplicationSettings.Current.FileQuantity = _selectedFiles.Count;
-
-			//if (FilesChanged != null)
-			//	FilesChanged(this, EventArgs.Empty);
 		}
 
 		private void deleteFiles()
@@ -133,7 +115,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 				{
 					FilePack.Remove(file.File);
 
-					ControlStateOperator.Operator.UnregisterForEncriptionProcess(file);
+					ControlStateOperator.Operator.UnregisterForEncryptionProcess(file);
 
 					_selectedFiles.Remove(file.File.FullName.ToUpper());
 				}
@@ -143,9 +125,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 			checkAllSelectableButtonsState();
 
 			ApplicationSettings.Current.FileQuantity = _selectedFiles.Count;
-
-			//if (FilesChanged != null)
-			//	FilesChanged(this, EventArgs.Empty);
 		}
 
 		private void readDialogFiles(OpenFileDialog dialog)
@@ -212,15 +191,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 			selectFile(args.IsSelected, args.File);
 		}
 
-		private void ButtonFileAdd_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			ButtonFileAdd.Style = (Style)FindResource("FileButtonDown");
-		}
+		private void ButtonFileAdd_MouseDown(object sender, MouseButtonEventArgs e) => ButtonFileAdd.Style = (Style)FindResource("FileButtonDown");
 
-		private void ButtonFileAdd_MouseLeave(object sender, MouseEventArgs e)
-		{
-			ButtonFileAdd.Style = (Style)FindResource("FileButton");
-		}
+		private void ButtonFileAdd_MouseLeave(object sender, MouseEventArgs e) => ButtonFileAdd.Style = (Style)FindResource("FileButton");
 
 		private void ButtonFileAdd_MouseUp(object sender, MouseButtonEventArgs e)
 		{
@@ -229,15 +202,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 			addFiles();
 		}
 
-		private void ButtonFileDelete_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			ButtonFileDelete.Style = (Style)FindResource("FileButtonDeleteDown");
-		}
+		private void ButtonFileDelete_MouseDown(object sender, MouseButtonEventArgs e) => ButtonFileDelete.Style = (Style)FindResource("FileButtonDeleteDown");
 
-		private void ButtonFileDelete_MouseLeave(object sender, MouseEventArgs e)
-		{
-			checkDeleteButtonStyleAndState();
-		}
+		private void ButtonFileDelete_MouseLeave(object sender, MouseEventArgs e) => checkDeleteButtonStyleAndState();
 
 		private void ButtonFileDelete_MouseUp(object sender, MouseEventArgs e)
 		{
@@ -246,10 +213,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 			checkDeleteButtonStyleAndState();
 		}
 
-		private void ButtonFileSelectAll_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			ButtonFileSelectAll.Style = (Style)FindResource("FileButtonSelectAllDown");
-		}
+		private void ButtonFileSelectAll_MouseDown(object sender, MouseButtonEventArgs e) => ButtonFileSelectAll.Style = (Style)FindResource("FileButtonSelectAllDown");
 
 		private void ButtonFileSelectAll_MouseUp(object sender, MouseButtonEventArgs e)
 		{
@@ -257,15 +221,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 			checkAllSelectableButtonsState();
 		}
 
-		private void ButtonFileSelectAll_MouseLeave(object sender, MouseEventArgs e)
-		{
-			checkAllSelectableButtonsState();
-		}
+		private void ButtonFileSelectAll_MouseLeave(object sender, MouseEventArgs e) => checkAllSelectableButtonsState();
 
-		private void ButtonFileDeselectAll_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			ButtonFileDeselectAll.Style = (Style)FindResource("FileButtonDeselectAllDown");
-		}
+		private void ButtonFileDeselectAll_MouseDown(object sender, MouseButtonEventArgs e) => ButtonFileDeselectAll.Style = (Style)FindResource("FileButtonDeselectAllDown");
 
 		private void ButtonFileDeselectAll_MouseUp(object sender, MouseButtonEventArgs e)
 		{
@@ -273,10 +231,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 			checkAllSelectableButtonsState();
 		}
 
-		private void ButtonFileDeselectAll_MouseLeave(object sender, MouseEventArgs e)
-		{
-			checkAllSelectableButtonsState();
-		}
+		private void ButtonFileDeselectAll_MouseLeave(object sender, MouseEventArgs e) => checkAllSelectableButtonsState();
 
 		private void PanelFiles_MouseDown(object sender, MouseButtonEventArgs e)
 		{
@@ -284,10 +239,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 				IsMouseButtonTakeDawn = true;
 		}
 
-		private void PanelFiles_MouseUp(object sender, MouseEventArgs e)
-		{
-			IsMouseButtonTakeDawn = false;
-		}
+		private void PanelFiles_MouseUp(object sender, MouseEventArgs e) => IsMouseButtonTakeDawn = false;
 
 		#endregion
 

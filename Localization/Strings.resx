@@ -163,7 +163,7 @@
     <value>Read access is missed for files</value>
   </data>
   <data name="MoreFeatures" xml:space="preserve">
-    <value>More Features</value>
+    <value>Encryption</value>
   </data>
   <data name="OfFiles" xml:space="preserve">
     <value>Files</value>
@@ -179,6 +179,9 @@
   </data>
   <data name="ReadArchive" xml:space="preserve">
     <value>Read Archive</value>
+  </data>
+  <data name="ReadPack" xml:space="preserve">
+    <value>Read pack</value>
   </data>
   <data name="RequiredQuantity" xml:space="preserve">
     <value>required</value>
@@ -202,7 +205,7 @@
     <value>Show password</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
-    <value>Simple &amp; Fast</value>
+    <value>Decryption</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>

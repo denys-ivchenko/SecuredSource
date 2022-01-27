@@ -13,7 +13,7 @@ using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
-	public partial class SimpleAndFastAreaControl : UserControl
+	public partial class DecryptionAreaControl : UserControl
 	{
 		#region Private declarations
 
@@ -26,7 +26,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Constructors
 
-		public SimpleAndFastAreaControl()
+		public DecryptionAreaControl()
 		{
 			InitializeComponent();
 
@@ -37,11 +37,13 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public properties
 
+		public EncryptionPack Pack { get; private set; }
+
 		public PackData FilePack { get => ControlFiles.FilePack; }
 
 		public IMainWindow Host { get; set; }
 
-		public SimpleAndFastPanelControl Panel => ControlPanel;
+		public DecryptionPanelControl Panel => ControlPanel;
 
 		#endregion
 
@@ -61,15 +63,14 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			ApplicationSettings.Current.AlgorithmChanged += ApplicationSettings_AlgorithmChanged;
-			ApplicationSettings.Current.PasswordChanged += ApplicationSettings_PasswordChanged;
-			ApplicationSettings.Current.FileQuantityChanged += ApplicationSettings_FileQuantityChanged;
+			ApplicationSettings.Current.DecryptionPackPathChanged += (s, a) => packChanged();
+			ApplicationSettings.Current.DecryptionDirectoryChanged += (s, a) => packDirectoryChanged();
+
+			Panel.PasswordChanged += (s, a) => checkStartButton();
 
 			ColumnPanel.Width = new GridLength(ApplicationSettings.Current.PanelWidth);
 
 			checkStartButton();
-
-			Panel.FileChanged += (s, a) => { checkStartButton(); };
 		}
 
 		private void progress(int percentage)
@@ -84,14 +85,44 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void checkStartButton()
 		{
-			ButtonStart.IsEnabled = !string.IsNullOrEmpty(Panel.FileName);
+			var filePathAndDirectoryIsValid = checkPackFilePathAndDirectory();
+
+			ButtonStart.IsEnabled = filePathAndDirectoryIsValid && Pack != null && Pack.PasswordHash == Panel.PasswordHash;
+		}
+
+		private void packChanged()
+		{
+			if (!string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionPackPath))
+			{
+				var file = new FileInfo(ApplicationSettings.Current.DecryptionPackPath);
+
+				if (file.Exists)
+					Pack = new EncryptionPack(ApplicationSettings.Current.DecryptionPackPath, Panel.Password, ApplicationSettings.Current.DecryptionDirectory);
+				else
+					Pack = null;
+			}
+
+			checkStartButton();
+		}
+
+		private void packDirectoryChanged() => checkStartButton();
+
+		private bool checkPackFilePathAndDirectory()
+		{
+			if (string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionPackPath) || string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionDirectory))
+				return false;
+
+			var file = new FileInfo(ApplicationSettings.Current.DecryptionPackPath ?? @"c:\not-exist-directoty-$$\not-exist-file.$$");
+			var directory = new DirectoryInfo(ApplicationSettings.Current.DecryptionDirectory ?? @"c:\not-exist-directoty-$$");
+
+			return file.Exists && directory.Exists;
 		}
 
 		private void saveSplitterWidth()
 		{
 			ApplicationSettings.Current.PanelWidth = (int)ColumnPanel.ActualWidth;
 
-			Host.MoreFeaturesArea.SetPanelWidth(ApplicationSettings.Current.PanelWidth);
+			Host.EncryptionArea.SetPanelWidth(ApplicationSettings.Current.PanelWidth);
 		}
 
 		private void setPanelWidth(int width)
@@ -101,19 +132,14 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void start()
 		{
-			EncryptionPack deserializer = new EncryptionPack(Path.Combine(ApplicationSettings.Current.Directory, $"{ApplicationSettings.Current.FileName}.$$"), ControlPanel.Password, FilePack);
-			deserializer.Finished += Serialize_Finished;
-			deserializer.Processed += Serialize_Processed;
+			var pack = new EncryptionPack(ApplicationSettings.Current.DecryptionPackPath, Panel.Password, ApplicationSettings.Current.DecryptionDirectory);
 
-			ControlProgress.Value = 0;
-			ControlProgress.Visibility = Visibility.Visible;
-			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = false);
+			pack.Finished += (s, a) =>
+			{
+				
+			};
 
-			_encryptor = deserializer;
-
-			started();
-
-			deserializer.Serialize();
+			pack.Deserialize();
 		}
 
 		private void started()
@@ -148,10 +174,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void ApplicationSettings_PasswordChanged(object sender, EventArgs e) => checkStartButton();
 
-		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e) => checkStartButton();
-
-		private void ApplicationSettings_FileQuantityChanged(object sender, EventArgs e) => checkStartButton();
-
 		private void Splitter_DragCompleted(object sender, DragCompletedEventArgs e) => saveSplitterWidth();
 
 		private void Serialize_Finished(object sender, EventArgs e) => finished(100);
@@ -161,6 +183,8 @@ namespace Telesyk.SecuredSource.UI.Controls
 		private void ButtonStop_Click(object sender, RoutedEventArgs e) => stop();
 
 		private void ButtonStart_Click(object sender, RoutedEventArgs e) => start();
+
+		//private void ButtonRead_Click(object sender, RoutedEventArgs e) => readPack();
 
 		#endregion
 

@@ -6,11 +6,11 @@ using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
-	public partial class MoreFeaturesPanelControl : UserControl
+	public partial class EncryptionPanelControl : UserControl
 	{
 		#region Constructors
 
-		public MoreFeaturesPanelControl()
+		public EncryptionPanelControl()
 		{
 			InitializeComponent();
 
@@ -23,6 +23,12 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		public string Password => ControlPassword.Password ?? String.Empty;
 
+		public byte[] PasswordBytes => ControlPassword.PasswordBytes;
+
+		public byte[] PasswordHashBytes => ControlPassword.PasswordHashBytes;
+
+		public string PasswordHash => ControlPassword.PasswordHash;
+
 		#endregion
 
 		#region Public methods
@@ -33,7 +39,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			ControlPassword.Mode = ControlMode.Encrypt;
+			ControlPassword.Mode = ApplicationMode.Encryption;
 
 			TextFileName.Text = ApplicationSettings.Current.FileName;
 			TextFileName.TextChanged += (s, a) => ApplicationSettings.Current.FileName = TextFileName.Text;

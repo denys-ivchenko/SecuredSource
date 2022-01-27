@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Telesyk.SecuredSource.UI.Controls.SimpleAndFastPanelControl"
+﻿<UserControl x:Class="Telesyk.SecuredSource.UI.Controls.DecryptionPanelControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,10 +7,10 @@
 	xmlns:res="clr-namespace:Telesyk.SecuredSource.Globalization;assembly=Telesyk.SecuredSource.Localization"
 	mc:Ignorable="d" d:DesignHeight="350" d:DesignWidth="250">
 	<StackPanel Style="{StaticResource PanelContainer}">
-		<local:SelectFileControl x:Name="ControlFile" />
-		<local:PasswordControl x:Name="ControlPassword" />
-		<Button x:Name="ButtonLoad" Content="{x:Static res:Strings.ReadArchive}" Style="{StaticResource PanelFieldHeader}" Click="ButtonLoad_Click" />
-		<local:SelectDirectoryControl x:Name="ControlDirectory" />
+		<local:SelectFileControl x:Name="ControlFile" Mode="Decryption" />
+		<local:SelectDirectoryControl x:Name="ControlDirectory" Mode="Decryption" />
+		<local:SelectAlgorithmControl x:Name="ControlAlgorithm" Mode="Decryption" />
+		<local:PasswordControl x:Name="ControlPassword" Mode="Decryption"/>
 		<TextBlock x:Name="TextProcess" Style="{StaticResource PanelFieldHeader}" />
 	</StackPanel>
 </UserControl>

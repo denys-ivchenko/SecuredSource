@@ -4,10 +4,10 @@ namespace Telesyk.SecuredSource.UI.Controls
 {
 	public interface IMainWindow
 	{
-		SimpleAndFastPanelControl SimpleAndFastPanel { get; }
-		SimpleAndFastAreaControl SimpleAndFastArea { get; }
+		DecryptionPanelControl SimpleAndFastPanel { get; }
+		DecryptionAreaControl DecryptionArea { get; }
 
-		MoreFeaturesPanelControl MoreFeaturesPanel { get; }
-		MoreFeaturesAreaControl MoreFeaturesArea { get; }
+		EncryptionPanelControl MoreFeaturesPanel { get; }
+		EncryptionAreaControl EncryptionArea { get; }
 	}
 }

@@ -10,12 +10,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 {
 	public partial class SelectDirectoryControl : UserControl
 	{
-		#region Private fields
-
-		private ControlMode _mode = ControlMode.Encrypt;
-
-		#endregion
-
 		#region Constructors
 
 		public SelectDirectoryControl()
@@ -29,16 +23,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public properties
 
-		public ControlMode Mode
-		{
-			get => _mode;
-			set
-			{
-				_mode = value;
-
-				ensureMode();
-			}
-		}
+		public ApplicationMode Mode { get; set; } = ApplicationMode.Encryption;
 
 		#endregion
 
@@ -46,15 +31,12 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			TextDirectory.Text = ApplicationSettings.Current.Directory;
+			TextDirectory.Text = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.Directory : ApplicationSettings.Current.DecryptionDirectory;
 
 			ControlStateOperator.Operator.RegisterForEncryptionProcess(TextDirectory, ButtonSelect);
 		}
 
-		private void ensureMode()
-		{
-			TextTitle.Text = Mode == ControlMode.Encrypt ? Strings.SaveDirectory : Strings.UploadDirectory;
-		}
+		public override void OnApplyTemplate() => TextTitle.Text = Mode == ApplicationMode.Encryption ? Strings.SaveDirectory : Strings.UploadDirectory;
 
 		#region Handlers
 
@@ -62,10 +44,15 @@ namespace Telesyk.SecuredSource.UI.Controls
 		{
 			forms.FolderBrowserDialog dialog = new forms.FolderBrowserDialog();
 			dialog.Description = Strings.SelectSavingDirectory;
-			dialog.SelectedPath = ApplicationSettings.Current.Directory;
+			dialog.SelectedPath = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.Directory : ApplicationSettings.Current.DecryptionDirectory;
 			dialog.ShowDialog();
 
-			TextDirectory.Text = ApplicationSettings.Current.Directory = dialog.SelectedPath;
+			TextDirectory.Text = dialog.SelectedPath;
+
+			if (ApplicationSettings.Current.Mode == ApplicationMode.Encryption)
+				ApplicationSettings.Current.Directory = dialog.SelectedPath;
+			else
+				ApplicationSettings.Current.DecryptionDirectory = dialog.SelectedPath;
 		}
 
 		#endregion

@@ -8,10 +8,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 {
 	public partial class SelectAlgorithmControl : UserControl
 	{
-		#region Private declarations
-
-		#endregion
-
 		#region Constructors
 
 		public SelectAlgorithmControl()
@@ -25,13 +21,19 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public properties
 
+		private ApplicationMode _mode;
+
+		public ApplicationMode Mode 
+		{ 
+			get => _mode;
+			set => _mode = value; 
+		}
+
+		//public event EventHandler AlgorithmChanged;
+
 		#endregion
 
-		#region Public methods
-
-		#endregion
-
-		#region public events
+		#region Public events
 
 		//public event EventHandler AlgorithmChanged;
 
@@ -42,15 +44,25 @@ namespace Telesyk.SecuredSource.UI.Controls
 		private void init()
 		{
 			SelectAlgorithm.ItemsSource = Enum.GetNames(typeof(CryptoAlgorithm));
-			SelectAlgorithm.SelectedValue = ApplicationSettings.Current.Algorithm.ToString();
 
 			ControlStateOperator.Operator.RegisterForEncryptionProcess(SelectAlgorithm);
+		}
+
+		public override void OnApplyTemplate()
+		{
+			base.OnApplyTemplate();
+
+			SelectAlgorithm.SelectedValue = $"{(Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.Algorithm : ApplicationSettings.Current.DecryptionAlgorithm)}";
 		}
 
 		private void changeAlgorythm()
 		{
 			Enum.TryParse(SelectAlgorithm.SelectedValue.ToString(), out CryptoAlgorithm algorythm);
-			ApplicationSettings.Current.Algorithm = algorythm;
+
+			if (Mode == ApplicationMode.Encryption)
+				ApplicationSettings.Current.Algorithm = algorythm;
+			else
+				ApplicationSettings.Current.DecryptionAlgorithm = algorythm;
 		}
 
 		#region Handlers

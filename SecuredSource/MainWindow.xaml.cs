@@ -13,7 +13,7 @@ namespace Telesyk.SecuredSource.UI
 	{
 		#region Private declarations
 
-		private ApplicationMode _mode = ApplicationMode.SimpleAndFast;
+		private ApplicationMode _mode = ApplicationMode.Decryption;
 
 		#endregion
 
@@ -36,13 +36,13 @@ namespace Telesyk.SecuredSource.UI
 			private set { ensureMode(value); }
 		}
 
-		public SimpleAndFastPanelControl SimpleAndFastPanel { get; private set; }
+		public DecryptionPanelControl SimpleAndFastPanel { get; private set; }
 
-		public SimpleAndFastAreaControl SimpleAndFastArea { get; private set; } = new SimpleAndFastAreaControl();
+		public DecryptionAreaControl DecryptionArea { get; private set; } = new DecryptionAreaControl();
 
-		public MoreFeaturesPanelControl MoreFeaturesPanel { get; private set; }
+		public EncryptionPanelControl MoreFeaturesPanel { get; private set; }
 
-		public MoreFeaturesAreaControl MoreFeaturesArea { get; private set; } = new MoreFeaturesAreaControl();
+		public EncryptionAreaControl EncryptionArea { get; private set; } = new EncryptionAreaControl();
 
 		#endregion
 
@@ -52,11 +52,11 @@ namespace Telesyk.SecuredSource.UI
 		{
 			Mode = ApplicationSettings.Current.Mode;
 
-			SimpleAndFastPanel = SimpleAndFastArea.Panel;
-			MoreFeaturesPanel = MoreFeaturesArea.Panel;
+			SimpleAndFastPanel = DecryptionArea.Panel;
+			MoreFeaturesPanel = EncryptionArea.Panel;
 
-			SimpleAndFastArea.Host = this;
-			MoreFeaturesArea.Host = this;
+			DecryptionArea.Host = this;
+			EncryptionArea.Host = this;
 
 			var textVersion = ((Run)FindName("textVersion"));
 			textVersion.ToolTip = textVersion.Text = ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false)[0]).Version;
@@ -66,7 +66,7 @@ namespace Telesyk.SecuredSource.UI
 			Top = ApplicationSettings.Current.WindowTop;
 			Left = ApplicationSettings.Current.WindowLeft;
 
-			ControlStateOperator.Operator.RegisterForEncryptionProcess(RadioMoreFeatures, RadioSimpleAndFast);
+			ControlStateOperator.Operator.RegisterForEncryptionProcess(RadioEncryption, RadioDecryption);
 		}
 
 		private void ensureMode(ApplicationMode mode)
@@ -75,11 +75,11 @@ namespace Telesyk.SecuredSource.UI
 
 			switch (Mode)
 			{
-				case ApplicationMode.SimpleAndFast:
-					RadioSimpleAndFast.IsChecked = true;
+				case ApplicationMode.Decryption:
+					RadioDecryption.IsChecked = true;
 					break;
-				case ApplicationMode.MoreFeatures:
-					RadioMoreFeatures.IsChecked = true;
+				case ApplicationMode.Encryption:
+					RadioEncryption.IsChecked = true;
 					break;
 			}
 
@@ -92,11 +92,11 @@ namespace Telesyk.SecuredSource.UI
 			
 			switch(Mode)
 			{
-				case ApplicationMode.SimpleAndFast:
-					controlArea = SimpleAndFastArea;
+				case ApplicationMode.Decryption:
+					controlArea = DecryptionArea;
 					break;
-				case ApplicationMode.MoreFeatures:
-					controlArea = MoreFeaturesArea;
+				case ApplicationMode.Encryption:
+					controlArea = EncryptionArea;
 					break;
 			}
 

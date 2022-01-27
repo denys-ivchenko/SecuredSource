@@ -130,7 +130,7 @@
     <value>Просмотр…</value>
   </data>
   <data name="Decrypt" xml:space="preserve">
-    <value>Расшифровать</value>
+    <value>Дешифровать</value>
   </data>
   <data name="DeleteSelected" xml:space="preserve">
     <value>Удалить выбранные</value>
@@ -160,7 +160,7 @@
     <value>Отсутствует доступ на чтение таких файлов</value>
   </data>
   <data name="MoreFeatures" xml:space="preserve">
-    <value>Больше возможностей</value>
+    <value>Шифрование</value>
   </data>
   <data name="OfFiles" xml:space="preserve">
     <value>Файлов</value>
@@ -176,6 +176,9 @@
   </data>
   <data name="ReadArchive" xml:space="preserve">
     <value>Считать архив</value>
+  </data>
+  <data name="ReadPack" xml:space="preserve">
+    <value>Прочитать пакет</value>
   </data>
   <data name="RequiredQuantity" xml:space="preserve">
     <value>необходимо</value>
@@ -199,7 +202,7 @@
     <value>Показать пароль</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
-    <value>Просто и быстро</value>
+    <value>Дешифровка</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Начать</value>

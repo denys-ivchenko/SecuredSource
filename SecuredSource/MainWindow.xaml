@@ -17,8 +17,8 @@
 		</Grid.RowDefinitions>
 		<StackPanel Grid.Row="0" Panel.ZIndex="5" Style="{StaticResource Header}">
 			<StackPanel Style="{StaticResource HeaderContainer}" RadioButton.Checked="radioMode_Checked">
-				<RadioButton x:Name="RadioSimpleAndFast" Content="{x:Static res:Strings.SimpleAndFast}" Style="{StaticResource HeaderSimpleAndFastRadio}" />
-				<RadioButton x:Name="RadioMoreFeatures" Content="{x:Static res:Strings.MoreFeatures}" Style="{StaticResource HeaderRadio}" />
+				<RadioButton x:Name="RadioDecryption" Content="{x:Static res:Strings.SimpleAndFast}" Style="{StaticResource HeaderSimpleAndFastRadio}" />
+				<RadioButton x:Name="RadioEncryption" Content="{x:Static res:Strings.MoreFeatures}" Style="{StaticResource HeaderRadio}" />
 			
 			</StackPanel>
 		</StackPanel>

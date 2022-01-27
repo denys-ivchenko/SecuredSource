@@ -23,6 +23,8 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public properties
 
+		public ApplicationMode Mode { get; set; } = ApplicationMode.Encryption;
+
 		public string FileName => TextFile.Text;
 
 		#endregion
@@ -52,6 +54,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 			{
 				TextFile.Text = dialog.FileName;
 
+				if (ApplicationSettings.Current.Mode == ApplicationMode.Decryption)
+					ApplicationSettings.Current.DecryptionPackPath = dialog.FileName;
+
 				if (FileChanged != null)
 					FileChanged(this, new ValueProcessedEventArgs<string>(dialog.FileName));
 			};
@@ -62,10 +67,5 @@ namespace Telesyk.SecuredSource.UI.Controls
 		#endregion
 
 		#endregion
-
-		private void ButtonSelect_Click_1(object sender, System.Windows.RoutedEventArgs e)
-		{
-
-		}
 	}
 }

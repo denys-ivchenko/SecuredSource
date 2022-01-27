@@ -30,6 +30,9 @@ namespace Telesyk.SecuredSource
 		private const string _NODENAME_DIRECTORY = "directory";
 		private const string _NODENAME_FILE_NAME = "file-name";
 		private const string _NODENAME_ALGORITHM = "algorythm";
+		private const string _NODENAME_DECRYPTION_DIRECTORY = "decryption-directory";
+		private const string _NODENAME_DECRYPTION_PACK_PATH = "decryption-pack-path";
+		private const string _NODENAME_DECRYPTION_ALGORITHM = "decryption-algorythm";
 		private const string _NODENAME_REQUIRED_PASSWORD_LENGTH = "required-password-length";
 		//private const string _NODENAME_AES_PASSWORD_LENGTH = "aes-password-length";
 		//private const string _NODENAME_RIJNDAEL_PASSWORD_LENGTH = "rijndael-password-length";
@@ -39,7 +42,7 @@ namespace Telesyk.SecuredSource
 
 		#endregion
 
-		private ApplicationMode _mode = ApplicationMode.SimpleAndFast;
+		private ApplicationMode _mode = ApplicationMode.Decryption;
 		private CryptoAlgorithm _algorithm = CryptoAlgorithm.RC2;
 		private int _windowWidth = 600;
 		private int _windowHeight = 420;
@@ -51,6 +54,9 @@ namespace Telesyk.SecuredSource
 		private int _requiredPasswordLength = 16;
 		private int _passwordLength;
 		private int _fileQuantity;
+		private string _decryptionPackPath;
+		private string _decryptionDirectory;
+		private CryptoAlgorithm _decryptionAlgorithm = CryptoAlgorithm.RC2;
 		//private int _aesPasswordLength = 16;
 		//private int _rijndaelPasswordLength = 16;
 		//private int _desPasswordLength = 8;
@@ -152,35 +158,38 @@ namespace Telesyk.SecuredSource
 			set { changeFileQuantity(value); }
 		}
 
-		//public int AesPasswordLength
-		//{
-		//	get => _aesPasswordLength;
-		//	set { changeAlgorythmSettingValue(_NODENAME_AES_PASSWORD_LENGTH, value, ref _aesPasswordLength, CryptoAlgorithm.Aes == Algorythm); }
-		//}
+		public string DecryptionPackPath 
+		{ 
+			get => _decryptionPackPath; 
+			set
+			{
+				_decryptionPackPath = writeSettingValue(_NODENAME_DECRYPTION_PACK_PATH, value);
 
-		//public int RijndaelPasswordLength
-		//{
-		//	get => _rijndaelPasswordLength;
-		//	set { changeAlgorythmSettingValue(_NODENAME_RIJNDAEL_PASSWORD_LENGTH, value, ref _rijndaelPasswordLength, CryptoAlgorithm.Rijndael == Algorythm); }
-		//}
+				DecryptionPackPathChanged?.Invoke(this, EventArgs.Empty);
+			}
+		}
 
-		//public int DESPasswordLength
-		//{
-		//	get => _desPasswordLength;
-		//	set { changeAlgorythmSettingValue(_NODENAME_DES_PASSWORD_LENGTH, value, ref _desPasswordLength, CryptoAlgorithm.DES == Algorythm); }
-		//}
+		public string DecryptionDirectory 
+		{ 
+			get => _decryptionDirectory; 
+			set
+			{
+				_decryptionDirectory = writeSettingValue(_NODENAME_DECRYPTION_DIRECTORY, value);
 
-		//public int TripleDESPasswordLength
-		//{
-		//	get => _tripleDesPasswordLength;
-		//	set { changeAlgorythmSettingValue(_NODENAME_TRIPLEDES_PASSWORD_LENGTH, value, ref _tripleDesPasswordLength, CryptoAlgorithm.TripleDES == Algorythm); }
-		//}
+				DecryptionDirectoryChanged?.Invoke(this, EventArgs.Empty);
+			}
+		}
 
-		//public int RC5PasswordLength
-		//{
-		//	get => _rc2PasswordLength;
-		//	set { changeAlgorythmSettingValue(_NODENAME_RC5_PASSWORD_LENGTH, value, ref _rc2PasswordLength, CryptoAlgorithm.RC2 == Algorythm); }
-		//}
+		public CryptoAlgorithm DecryptionAlgorithm
+		{
+			get => _decryptionAlgorithm;
+			set
+			{ 
+				_decryptionAlgorithm = writeSettingValue(_NODENAME_DECRYPTION_ALGORITHM, value);
+
+				DecryptionAlgorithmChanged?.Invoke(this, EventArgs.Empty);
+			}
+		}
 
 		public PasswordSize PasswordSize => getPasswordSize(Algorithm);
 
@@ -197,6 +206,12 @@ namespace Telesyk.SecuredSource
 		public event EventHandler PasswordChanged;
 
 		public event EventHandler FileQuantityChanged;
+
+		public event EventHandler DecryptionPackPathChanged;
+
+		public event EventHandler DecryptionDirectoryChanged;
+
+		public event EventHandler DecryptionAlgorithmChanged;
 
 		#endregion
 
@@ -225,7 +240,10 @@ namespace Telesyk.SecuredSource
 			readIntegerSetting(_NODENAME_PANEL_WIDTH, ref _panelWidth);
 			readStringSetting(_NODENAME_DIRECTORY, ref _directory);
 			readStringSetting(_NODENAME_FILE_NAME, ref _fileName);
+			readStringSetting(_NODENAME_DECRYPTION_PACK_PATH, ref _decryptionPackPath);
+			readStringSetting(_NODENAME_DECRYPTION_DIRECTORY, ref _decryptionDirectory);
 			readEnumSetting<CryptoAlgorithm>(_NODENAME_ALGORITHM, ref _algorithm);
+			readEnumSetting<CryptoAlgorithm>(_NODENAME_DECRYPTION_ALGORITHM, ref _decryptionAlgorithm);
 			readIntegerSetting(_NODENAME_REQUIRED_PASSWORD_LENGTH, ref _requiredPasswordLength);
 
 			_directory = !string.IsNullOrEmpty(_directory) ? _directory : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);

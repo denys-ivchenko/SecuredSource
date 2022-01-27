@@ -4,7 +4,7 @@ namespace Telesyk.SecuredSource
 {
 	public enum ApplicationMode
 	{
-		SimpleAndFast = 0,
-		MoreFeatures = 1
+		Decryption = 0,
+		Encryption = 1
 	}
 }

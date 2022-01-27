@@ -49,11 +49,9 @@ namespace Telesyk.SecuredSource
 			}
 		}
 
-		public CryptoAlgorithm Algorythm { get; internal set; }
+		public CryptoAlgorithm Algorithm { get; internal set; }
 
-		public int PasswordLength { get; internal set; }
-
-		public string PasswordHash { get; internal set; }
+		public string PasswordHash { get; set; }
 
 		public int FileCount { get => _files.Count; }
 
@@ -70,10 +68,6 @@ namespace Telesyk.SecuredSource
 		internal void Remove(FileData file) => remove(file);
 
 		internal void Clear() => clear();
-
-		//public byte[] Encrypt() => encrypt();
-
-		//public PackData Decrypt() => decrypt();
 
 		#region Static methods
 
@@ -111,16 +105,6 @@ namespace Telesyk.SecuredSource
 		#region Private methods
 
 		#region Instance methods
-
-		private void encrypt()
-		{
-
-		}
-
-		private void decrypt()
-		{
-
-		}
 
 		private void recalculateNames()
 		{
@@ -242,9 +226,6 @@ namespace Telesyk.SecuredSource
 		private static PackData deserialize(byte[] bytes)
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
-
-			//var base64 = Encoding.UTF8.GetString(bytes);
-			//bytes = Convert.FromBase64String(base64);
 
 			using (var stream = new MemoryStream(bytes))
 				return (PackData)formatter.Deserialize(stream);

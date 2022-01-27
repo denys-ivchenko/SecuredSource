@@ -196,7 +196,7 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на More Features.
+        ///   Ищет локализованную строку, похожую на Encryption.
         /// </summary>
         public static string MoreFeatures {
             get {
@@ -246,6 +246,15 @@ namespace Telesyk.SecuredSource.Globalization {
         public static string ReadArchive {
             get {
                 return ResourceManager.GetString("ReadArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Read pack.
+        /// </summary>
+        public static string ReadPack {
+            get {
+                return ResourceManager.GetString("ReadPack", resourceCulture);
             }
         }
         
@@ -313,7 +322,7 @@ namespace Telesyk.SecuredSource.Globalization {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Simple &amp; Fast.
+        ///   Ищет локализованную строку, похожую на Decryption.
         /// </summary>
         public static string SimpleAndFast {
             get {
