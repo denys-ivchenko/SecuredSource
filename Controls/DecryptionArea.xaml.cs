@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 
 using Telesyk;
 
-using Telesyk.Cryptography;
+using Telesyk.SecuredSource.Globalization;
+
+using oper = Telesyk.SecuredSource.ApplicationOperator;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
@@ -17,9 +19,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 	{
 		#region Private declarations
 
-		private IProgress<int> _progress = null;
-		private IProgress<int> _finish = null;
-		private EncryptionPack _encryptor;
 		private TickTimer _timer;
 
 		#endregion
@@ -36,10 +35,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 		#endregion
 
 		#region Public properties
-
-		public EncryptionPack Pack { get; private set; }
-
-		public PackData FilePack { get => ControlFiles.FilePack; }
 
 		public IMainWindow Host { get; set; }
 
@@ -63,10 +58,13 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			ApplicationSettings.Current.DecryptionPackPathChanged += (s, a) => packChanged();
-			ApplicationSettings.Current.DecryptionDirectoryChanged += (s, a) => packDirectoryChanged();
+			oper.Operator.DeserializePackChanged += (s, a) => checkStartButton();
 
-			Panel.PasswordChanged += (s, a) => checkStartButton();
+			ApplicationSettings.Current.DecryptionAlgorithmChanged += (s, a) => checkStartButton();
+
+			ApplicationSettings.Current.DecryptionDirectoryChanged += (s, a) => checkStartButton();
+
+			ApplicationSettings.Current.DecryptionPasswordChanged += (s, a) => checkStartButton();
 
 			ColumnPanel.Width = new GridLength(ApplicationSettings.Current.PanelWidth);
 
@@ -85,37 +83,30 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void checkStartButton()
 		{
-			var filePathAndDirectoryIsValid = checkPackFilePathAndDirectory();
-
-			ButtonStart.IsEnabled = filePathAndDirectoryIsValid && Pack != null && Pack.PasswordHash == Panel.PasswordHash;
+			ButtonStart.IsEnabled = checkPackFilePathAndDirectory();
 		}
-
-		private void packChanged()
-		{
-			if (!string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionPackPath))
-			{
-				var file = new FileInfo(ApplicationSettings.Current.DecryptionPackPath);
-
-				if (file.Exists)
-					Pack = new EncryptionPack(ApplicationSettings.Current.DecryptionPackPath, Panel.Password, ApplicationSettings.Current.DecryptionDirectory);
-				else
-					Pack = null;
-			}
-
-			checkStartButton();
-		}
-
-		private void packDirectoryChanged() => checkStartButton();
 
 		private bool checkPackFilePathAndDirectory()
 		{
-			if (string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionPackPath) || string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionDirectory))
+			if (string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionPackFilePath) || string.IsNullOrEmpty(ApplicationSettings.Current.DecryptionDirectory))
 				return false;
 
-			var file = new FileInfo(ApplicationSettings.Current.DecryptionPackPath ?? @"c:\not-exist-directoty-$$\not-exist-file.$$");
+			var file = new FileInfo(ApplicationSettings.Current.DecryptionPackFilePath ?? @"c:\not-exist-directoty-$$\not-exist-file.$$");
 			var directory = new DirectoryInfo(ApplicationSettings.Current.DecryptionDirectory ?? @"c:\not-exist-directoty-$$");
 
-			return file.Exists && directory.Exists;
+			if (!file.Exists || !directory.Exists)
+				return false;
+
+			if (oper.Operator.DeserializePack == null || !oper.Operator.DeserializePack.IsValid)
+				return false;
+
+			if (ApplicationSettings.Current.DecryptionAlgorithm != oper.Operator.DeserializePack.FilePack.Algorithm)
+				return false;
+
+			if (oper.Operator.DeserializePack.FilePack.Password.Hash != ApplicationSettings.Current.DecryptionPassword?.Hash)
+				return false;
+
+			return true;
 		}
 
 		private void saveSplitterWidth()
@@ -132,20 +123,21 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void start()
 		{
-			var pack = new EncryptionPack(ApplicationSettings.Current.DecryptionPackPath, Panel.Password, ApplicationSettings.Current.DecryptionDirectory);
+			oper.Operator.DeserializePack = new EncryptionPack(ApplicationSettings.Current.DecryptionPackFilePath, ApplicationSettings.Current.DecryptionDirectory);
 
-			pack.Finished += (s, a) =>
-			{
-				
-			};
+			oper.Operator.DeserializePack.Processed += (s, a) => progress(a.Value);
+			oper.Operator.DeserializePack.Finished += (s, a) => finished(100);
 
-			pack.Deserialize();
-		}
+			ControlProgress.Value = 0;
+			ControlProgress.Visibility = Visibility.Visible;
+			TextTime.Visibility = Visibility.Visible;
 
-		private void started()
-		{
+			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = false);
+
 			_timer = new TickTimer(1000, writeTime);
 			_timer.Start();
+
+			oper.Operator.DeserializePack.Deserialize();
 		}
 
 		private void writeTime(TickTimer timer)
@@ -159,20 +151,20 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 			ControlProgress.Value = percentage;
 			ControlProgress.Visibility = Visibility.Hidden;
+
+			TextTime.Visibility = Visibility.Collapsed;
+
 			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = true);
 
-			_timer.Stop();
+			_timer.Stop(true);
 
-			if (_encryptor.IsFaulted)
-				for (var i = 0; i < _encryptor.Exception.InnerExceptions.Count; i++)
-					MessageBox.Show(_encryptor.Exception.InnerExceptions[i].Message, _encryptor.Exception.InnerExceptions[i].GetType().Name);
+			if (oper.Operator.DeserializePack.IsFaulted)
+				MessageBox.Show(oper.Operator.DeserializePack.Error.Message, oper.Operator.DeserializePack.Error.GetType().Name);
 		}
 
-		private void stop() => _encryptor.Cancel();
+		private void stop() => oper.Operator.DeserializePack.Cancel();
 
 		#region Handlers
-
-		private void ApplicationSettings_PasswordChanged(object sender, EventArgs e) => checkStartButton();
 
 		private void Splitter_DragCompleted(object sender, DragCompletedEventArgs e) => saveSplitterWidth();
 

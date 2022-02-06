@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Telesyk.SecuredSource
 {
-	public sealed class ControlStateOperator
+	public sealed class ApplicationOperator
 	{
 		#region Private declarations
 
-		private static Lazy<ControlStateOperator> _operator = new Lazy<ControlStateOperator>(() => new ControlStateOperator());
+		private static Lazy<ApplicationOperator> _operator = new Lazy<ApplicationOperator>(() => new ApplicationOperator());
 
 		private List<UIElement> _encryptionControls = new List<UIElement>();
 		private List<IEnablingState> _encryptionContainers = new List<IEnablingState>();
+
+		private PackData _encryptionPack;
+
+		private EncryptionPack _serializePack;
+
+		private EncryptionPack _deserializePack;
 
 		//private List<UIElement> _decryptionControls = new List<UIElement>();
 		//private List<IEnablingState> _decryptionContainers = new List<IEnablingState>();
@@ -24,22 +27,59 @@ namespace Telesyk.SecuredSource
 
 		#region Constructors
 
-		private ControlStateOperator()
+		private ApplicationOperator()
 		{
-
+			init();
 		}
 
 		#endregion
 
 		#region Public properties
 
-		public static ControlStateOperator Operator => _operator.Value;
+		public static ApplicationOperator Operator => _operator.Value;
 
 		public bool IsInProcess { get; private set; }
+
+		public PackData EncryptionPack
+		{
+			get
+			{
+				if (_encryptionPack == null)
+					_encryptionPack = new PackData(ApplicationSettings.Current.EncryptionPassword, ApplicationSettings.Current.AppVersion);
+
+				return _encryptionPack;
+			}
+		}
+
+		public EncryptionPack SerializePack
+		{ 
+			get => _serializePack; 
+			internal set
+			{
+				_serializePack = value;
+
+				SerializePackChanged?.Invoke(this, new ValueProcessedEventArgs<EncryptionPack>(SerializePack));
+			}
+		}
+
+		public EncryptionPack DeserializePack
+		{
+			get => _deserializePack;
+			internal set
+			{
+				_deserializePack = value;
+
+				DeserializePackChanged?.Invoke(this, new ValueProcessedEventArgs<EncryptionPack>(DeserializePack));
+			}
+		}
 
 		#endregion
 
 		#region Public methods
+
+		public void InitStartUpFile() => initStartUpFile();
+
+		public void LoadDeserializePack(string packPath) => loadDeserializePack(packPath);
 
 		public void RegisterForEncryptionProcess(params UIElement[] controls) => registerForEncryptionProcess(controls);
 
@@ -65,7 +105,55 @@ namespace Telesyk.SecuredSource
 
 		#endregion
 
+		#region Public events
+
+		public event ValueProcessedEventHandler<EncryptionPack> SerializePackChanged;
+
+		public event ValueProcessedEventHandler<EncryptionPack> DeserializePackChanged;
+
+		#endregion
+
 		#region Private methods
+
+		private void init()
+		{
+			//ApplicationSettings.Current.EncryptionAlgorithmChanged += (s, a)
+			//	=> SerializePack.FilePack.Algorithm = ApplicationSettings.Current.EncryptionAlgorithm;
+
+			ApplicationSettings.Current.EncryptionPasswordChanged += (s, a)
+				=> EncryptionPack.Password = ApplicationSettings.Current.EncryptionPassword;
+		}
+
+		private void loadDeserializePack(string packPath)
+		{
+			ApplicationSettings.Current.DecryptionPackFilePath = null;
+			
+			DeserializePack = null;
+
+			if (!string.IsNullOrEmpty(packPath))
+			{
+				var file = new FileInfo(packPath);
+
+				if (file.Exists)
+				{
+					ApplicationSettings.Current.DecryptionPackFilePath = packPath;
+
+					DeserializePack = new EncryptionPack(packPath, ApplicationSettings.Current.DecryptionDirectory);
+
+					if (!DeserializePack.IsValid)
+						DeserializePack = null;
+				}
+			}
+		}
+
+		private void initStartUpFile()
+		{
+			try { LoadDeserializePack(ApplicationSettings.Current.DecryptionPackFilePath); }
+			catch { };
+
+			if (DeserializePack != null)
+				ApplicationSettings.Current.Mode = ApplicationMode.Decryption;
+		}
 
 		private void registerForEncryptionProcess(params UIElement[] controls)
 		{

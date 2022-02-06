@@ -24,10 +24,10 @@
 				<local:ProgressControl x:Name="ControlProgress" Visibility="Hidden" />
 				<Grid>
 					<Grid.ColumnDefinitions>
-						<ColumnDefinition></ColumnDefinition>
-						<ColumnDefinition></ColumnDefinition>
+						<ColumnDefinition Width="60" />
+						<ColumnDefinition />
 					</Grid.ColumnDefinitions>
-					<TextBlock x:Name="TextTime" Grid.Column="0" />
+					<TextBlock x:Name="TextTime" Grid.Column="0" Visibility="Collapsed" />
 					<StackPanel Grid.Column="1" Style="{StaticResource StartButtons}">
 						<Button x:Name="ButtonStop" Content="{x:Static res:Strings.Stop}" IsEnabled="false" Click="ButtonStop_Click" />
 						<!--<Button x:Name="ButtonRead" Content="{x:Static res:Strings.ReadPack}" IsEnabled="false" Click="ButtonRead_Click" />-->

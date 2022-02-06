@@ -11,6 +11,6 @@
 		<TextBox x:Name="TextFileName" />
 		<local:SelectDirectoryControl x:Name="ControlDirectory" Mode="Encryption" />
 		<local:SelectAlgorithmControl x:Name="ControlSelectAlgorithm" Mode="Encryption" />
-		<local:PasswordControl x:Name="ControlPassword" Mode="Encryption" />
+		<local:PasswordControl x:Name="ControlEncryptionPassword" Mode="Encryption" />
 	</StackPanel>
 </UserControl>

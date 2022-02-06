@@ -139,13 +139,25 @@
     <value>Отменить выделение для всех файлов</value>
   </data>
   <data name="DoDecrypt" xml:space="preserve">
-    <value>Расшифровать</value>
+    <value>Дешифровать</value>
   </data>
   <data name="DoEncrypt" xml:space="preserve">
-    <value>Зашифровать</value>
+    <value>Шифровать</value>
   </data>
   <data name="EncryptedFile" xml:space="preserve">
-    <value>Зашифрованый файл</value>
+    <value>Шифрованый файл</value>
+  </data>
+  <data name="Enigma" xml:space="preserve">
+    <value>Энигма — шифровальная  машина Вермахта.</value>
+  </data>
+  <data name="EnigmaLink" xml:space="preserve">
+    <value>https://ru.wikipedia.org/wiki/%D0%AD%D0%BD%D0%B8%D0%B3%D0%BC%D0%B0</value>
+  </data>
+  <data name="EnigmaLinkText" xml:space="preserve">
+    <value>Нажмите ДА чтобы узнать больше об Энигме.</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Ошибка!</value>
   </data>
   <data name="FileName" xml:space="preserve">
     <value>Имя файла</value>
@@ -156,17 +168,26 @@
   <data name="HidePassword" xml:space="preserve">
     <value>Скрыть пароль</value>
   </data>
+  <data name="IncorrectPackFile" xml:space="preserve">
+    <value>Поврежденный или неправильный формат файла!</value>
+  </data>
+  <data name="InfoDialog" xml:space="preserve">
+    <value>Автор: Денис Ивченко|Телефон: +380 96 943-69-80|Электропочта: denys-ivchenko@hotmail.com</value>
+  </data>
   <data name="MissingReadFileAccess" xml:space="preserve">
     <value>Отсутствует доступ на чтение таких файлов</value>
   </data>
   <data name="MoreFeatures" xml:space="preserve">
-    <value>Шифрование</value>
+    <value>Шифрация</value>
   </data>
   <data name="OfFiles" xml:space="preserve">
     <value>Файлов</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>Пароль</value>
+  </data>
+  <data name="PasswordHint" xml:space="preserve">
+    <value>Подсказка пароля</value>
   </data>
   <data name="PasswordLength" xml:space="preserve">
     <value>Длина пароля</value>
@@ -202,7 +223,7 @@
     <value>Показать пароль</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
-    <value>Дешифровка</value>
+    <value>Дешифрация</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Начать</value>
@@ -214,7 +235,7 @@
     <value>Символов</value>
   </data>
   <data name="Title" xml:space="preserve">
-    <value>Secured Source</value>
+    <value>Энигма</value>
   </data>
   <data name="UploadDirectory" xml:space="preserve">
     <value>Выгрузить в</value>

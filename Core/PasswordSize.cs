@@ -17,7 +17,7 @@ namespace Telesyk.SecuredSource
 
 		#region Constructors
 
-		public PasswordSize(CryptoAlgorithm name, int minSize, int maxSize, int skip)
+		public PasswordSize(SymmetricAlgorithmName name, int minSize, int maxSize, int skip)
 		{
 			Algorithm = name;
 			MinSize = minSize;
@@ -34,7 +34,7 @@ namespace Telesyk.SecuredSource
 
 		public int this[int index] => Sizes[index];
 
-		public CryptoAlgorithm Algorithm { get; private set; }
+		public SymmetricAlgorithmName Algorithm { get; private set; }
 
 		public string Key => Algorithm.ToString().ToString().ToUpper();
 

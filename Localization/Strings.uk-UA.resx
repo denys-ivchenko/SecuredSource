@@ -139,13 +139,25 @@
     <value>Скасувати виділення для всіх файлів</value>
   </data>
   <data name="DoDecrypt" xml:space="preserve">
-    <value>Розшифрувати</value>
+    <value>Дешифрувати</value>
   </data>
   <data name="DoEncrypt" xml:space="preserve">
-    <value>Зашифрувати</value>
+    <value>Шифрувати</value>
   </data>
   <data name="EncryptedFile" xml:space="preserve">
-    <value>Зашифрований файл</value>
+    <value>Шифрований файл</value>
+  </data>
+  <data name="Enigma" xml:space="preserve">
+    <value>Енігма — шифрувальна машина Вермахту.</value>
+  </data>
+  <data name="EnigmaLink" xml:space="preserve">
+    <value>https://uk.wikipedia.org/wiki/%D0%95%D0%BD%D1%96%D0%B3%D0%BC%D0%B0_(%D0%B0%D0%B2%D1%82%D0%BE%D0%BC%D0%B0%D1%82)</value>
+  </data>
+  <data name="EnigmaLinkText" xml:space="preserve">
+    <value>Натисніть ТАК щоб дізнатися про Енігму більше.</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Помилка!</value>
   </data>
   <data name="FileName" xml:space="preserve">
     <value>Ім'я файлу</value>
@@ -156,11 +168,17 @@
   <data name="HidePassword" xml:space="preserve">
     <value>Приховати пароль</value>
   </data>
+  <data name="IncorrectPackFile" xml:space="preserve">
+    <value>Пошкоджений або некоректний формат файлу!</value>
+  </data>
+  <data name="InfoDialog" xml:space="preserve">
+    <value>Автор: Денис Івченко|Телефон: +380 96 943-69-80|Електропошта: denys-ivchenko@hotmail.com</value>
+  </data>
   <data name="MissingReadFileAccess" xml:space="preserve">
     <value>Відсутній дозвіл на читання таких файлів</value>
   </data>
   <data name="MoreFeatures" xml:space="preserve">
-    <value>Шифрування</value>
+    <value>Шифрація</value>
   </data>
   <data name="OfFiles" xml:space="preserve">
     <value>Файлів</value>
@@ -168,11 +186,14 @@
   <data name="Password" xml:space="preserve">
     <value>Пароль</value>
   </data>
+  <data name="PasswordHint" xml:space="preserve">
+    <value>Підказка паролю</value>
+  </data>
   <data name="PasswordLength" xml:space="preserve">
     <value>Довжина паролю</value>
   </data>
   <data name="PasswordToolTip" xml:space="preserve">
-    <value>Це гасло буде використано як ключ шифрування</value>
+    <value>Цей пароль буде використаний як ключ шифрування</value>
   </data>
   <data name="ReadArchive" xml:space="preserve">
     <value>Зчитати архів</value>
@@ -202,7 +223,7 @@
     <value>Показати пароль</value>
   </data>
   <data name="SimpleAndFast" xml:space="preserve">
-    <value>Дешифрування</value>
+    <value>Дешифрація</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Розпочати</value>
@@ -214,7 +235,7 @@
     <value>Символів</value>
   </data>
   <data name="Title" xml:space="preserve">
-    <value>Secured Source</value>
+    <value>Енігма</value>
   </data>
   <data name="UploadDirectory" xml:space="preserve">
     <value>Вивантажити у</value>

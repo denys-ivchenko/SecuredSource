@@ -54,7 +54,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ControlStateOperator.cs" />
+    <Compile Include="ApplicationOperator.cs" />
     <Compile Include="IEnablingState.cs" />
     <Compile Include="PasswordSize.cs" />
     <Compile Include="ApplicationMode.cs" />

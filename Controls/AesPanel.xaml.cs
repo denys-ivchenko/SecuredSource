@@ -34,15 +34,15 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			((RadioButton)FindName($"RadioAesPasswordLength{ApplicationSettings.Current.RequiredPasswordLength}")).IsChecked = true;
+			//((RadioButton)FindName($"RadioAesPasswordLength{ApplicationSettings.Current.RequiredPasswordLength}")).IsChecked = true;
 		}
 
 		#region Handlers
 
 		private void RadioAesPasswordLength_Checked(object sender, RoutedEventArgs e)
 		{
-			int.TryParse(((RadioButton)sender).Content.ToString(), out int length);
-			ApplicationSettings.Current.RequiredPasswordLength = length;
+			//int.TryParse(((RadioButton)sender).Content.ToString(), out int length);
+			//ApplicationSettings.Current.RequiredPasswordLength = length;
 		}
 
 		#endregion

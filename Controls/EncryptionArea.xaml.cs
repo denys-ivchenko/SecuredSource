@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-using Telesyk.Cryptography;
+using oper = Telesyk.SecuredSource.ApplicationOperator;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
@@ -13,8 +13,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 	{
 		#region Private declarations
 
-		private IProgress<int> _progress = null;
-		private EncryptionPack _encryptor;
 		private TickTimer _timer;
 
 		#endregion
@@ -32,8 +30,6 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public properties
 
-		public PackData FilePack { get => ControlFiles.FilePack; }
-
 		public IMainWindow Host { get; set; }
 
 		public EncryptionPanelControl Panel => ControlPanel;
@@ -42,7 +38,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Protected properties
 
-		protected int lastPercentage;
+		protected int LastPercentage;
 
 		#endregion
 
@@ -52,16 +48,12 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#endregion
 
-		#region Overridies
-
-		#endregion
-
 		#region Private methods
 
 		private void init()
 		{
-			ApplicationSettings.Current.AlgorithmChanged += ApplicationSettings_AlgorithmChanged;
-			ApplicationSettings.Current.PasswordChanged += ApplicationSettings_PasswordChanged;
+			ApplicationSettings.Current.EncryptionAlgorithmChanged += ApplicationSettings_AlgorithmChanged;
+			ApplicationSettings.Current.EncryptionPasswordChanged += ApplicationSettings_PasswordChanged;
 			ApplicationSettings.Current.FileQuantityChanged += ApplicationSettings_FileQuantityChanged;
 
 			//ControlFiles.FilesChanged += ControlFiles_FilesChanged;
@@ -73,9 +65,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void progress(int percentage)
 		{
-			if (percentage > lastPercentage)
+			if (percentage > LastPercentage)
 			{
-				lastPercentage = percentage;
+				LastPercentage = percentage;
 
 				Debug.WriteLine($"percentage: {ControlProgress.Value = percentage}");
 			}
@@ -83,7 +75,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void checkStartButton()
 		{
-			ButtonStart.IsEnabled = ApplicationSettings.Current.PasswordSize.IsValid(ApplicationSettings.Current.PasswordLength) && ControlFiles.FilePack.FileCount > 0;
+			ButtonStart.IsEnabled = ApplicationSettings.Current.EncryptionPassword?.SymbolCount > 0 && oper.Operator.EncryptionPack.FileCount > 0;
 		}
 
 		private void saveSplitterWidth()
@@ -100,20 +92,19 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void start()
 		{
-			EncryptionPack serializer = new EncryptionPack(Path.Combine(ApplicationSettings.Current.Directory, $"{ApplicationSettings.Current.FileName}.$$"), ControlPanel.Password, FilePack);
-			serializer.Finished += Serialize_Finished;
-			serializer.Processed += Serialize_Processed;
+			oper.Operator.SerializePack = new EncryptionPack(Path.Combine(ApplicationSettings.Current.EncryptionDirectory, $"{ApplicationSettings.Current.FileName}.$$"), oper.Operator.EncryptionPack);
+
+			oper.Operator.SerializePack.Finished += Serialize_Finished;
+			oper.Operator.SerializePack.Processed += Serialize_Processed;
 
 			ControlProgress.Value = 0;
 			ControlProgress.Visibility = Visibility.Visible;
 			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = false);
 
-			_encryptor = serializer;
-
 			_timer = new TickTimer(1000, writeTime);
 			_timer.Start();
 
-			serializer.Serialize();
+			oper.Operator.SerializePack.Serialize();
 		}
 
 		private void writeTime(TickTimer timer)
@@ -123,9 +114,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void finished(int percentage)
 		{
-			_timer.Stop(); 
+			_timer.Stop(true);
 			
-			lastPercentage = 0;
+			LastPercentage = 0;
 
 			TextTime.Text = null;
 
@@ -133,28 +124,17 @@ namespace Telesyk.SecuredSource.UI.Controls
 			ControlProgress.Visibility = Visibility.Hidden;
 			ButtonStop.IsEnabled = !(ButtonStart.IsEnabled = true);
 
-			if (_encryptor.IsFaulted)
-				for (var i = 0; i < _encryptor.Exception.InnerExceptions.Count; i++)
-					MessageBox.Show(_encryptor.Exception.InnerExceptions[i].Message, _encryptor.Exception.InnerExceptions[i].GetType().Name);
+			if (oper.Operator.SerializePack.IsFaulted)
+				MessageBox.Show(oper.Operator.SerializePack.Error.Message, oper.Operator.SerializePack.Error.GetType().Name);
 		}
 
-		private void stop() => _encryptor.Cancel();
+		private void stop() => oper.Operator.SerializePack.Cancel();
 
 		#region Handlers
 
-		private void ApplicationSettings_PasswordChanged(object sender, EventArgs e)
-		{
-			FilePack.PasswordHash = Panel.PasswordHash;
+		private void ApplicationSettings_PasswordChanged(object sender, EventArgs e) => checkStartButton();
 
-			checkStartButton();
-		}
-
-		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e)
-		{
-			FilePack.Algorithm = ApplicationSettings.Current.Algorithm;
-
-			checkStartButton();
-		}
+		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e) => checkStartButton();
 
 		private void ApplicationSettings_FileQuantityChanged(object sender, EventArgs e) => checkStartButton();
 

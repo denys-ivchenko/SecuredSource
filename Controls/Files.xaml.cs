@@ -9,6 +9,8 @@ using Microsoft.Win32;
 
 using Telesyk.SecuredSource.Globalization;
 
+using oper = Telesyk.SecuredSource.ApplicationOperator;
+
 namespace Telesyk.SecuredSource.UI.Controls
 {
 	public partial class FilesControl : UserControl, IEnablingState
@@ -32,9 +34,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public properties
 
-		public PackData FilePack { get; } = new PackData();
-
 		public ApplicationMode Mode { get; set; } = ApplicationMode.Encryption;
+
+		public PackData Pack { get => Mode == ApplicationMode.Encryption ? oper.Operator.EncryptionPack : oper.Operator.DeserializePack?.FilePack; }
 
 		internal bool IsMouseButtonTakeDawn { get; private set; }
 
@@ -44,15 +46,24 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		public void SetEnablingState(bool disable) => setEnablingState(disable);
 
+		public override void OnApplyTemplate() => onApplyTemplate();
+
 		#endregion
 
 		#region Private methods
 
-		private void init() => ControlStateOperator.Operator.RegisterForEncryptionProcess(this);
+		private void init()
+		{
+			oper.Operator.RegisterForEncryptionProcess(this);
+		}
 
-		public override void OnApplyTemplate() => checkControlsEnablingByMode();
+		private void onApplyTemplate()
+		{
+			if (Mode == ApplicationMode.Decryption)
+				oper.Operator.DeserializePackChanged += (s, a) => bindFiles();
 
-		private void checkControlsEnablingByMode() => GridCommands.Visibility = Mode == ApplicationMode.Encryption ? Visibility.Visible : Visibility.Collapsed;
+			GridCommands.Visibility = Mode == ApplicationMode.Encryption ? Visibility.Visible : Visibility.Collapsed;
+		}
 
 		private void checkDeleteButtonStyleAndState() => setButtonEnablingState(ButtonFileDelete, "Delete", _selectedFiles.Count == 0);
 
@@ -60,7 +71,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 		{
 			setButtonEnablingState(ButtonFileDeselectAll, "DeselectAll", _selectedFiles.Count == 0);
 
-			setButtonEnablingState(ButtonFileSelectAll, "SelectAll", _selectedFiles.Count == FilePack.FileCount);
+			setButtonEnablingState(ButtonFileSelectAll, "SelectAll", _selectedFiles.Count == Pack.FileCount);
 		}
 
 		private void setButtonEnablingState(Image button, string name, bool disable)
@@ -74,7 +85,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 			setButtonEnablingState(ButtonFileAdd, null, disable);
 			setButtonEnablingState(ButtonFileDelete, "Delete", disable ? true : _selectedFiles.Count == 0);
 			setButtonEnablingState(ButtonFileDeselectAll, "DeselectAll", disable ? true : _selectedFiles.Count == 0);
-			setButtonEnablingState(ButtonFileSelectAll, "SelectAll", disable ? true : _selectedFiles.Count == FilePack.FileCount);
+			setButtonEnablingState(ButtonFileSelectAll, "SelectAll", disable ? true : _selectedFiles.Count == (Pack != null ? Pack.FileCount : 0));
 		}
 
 		private void setAllFilesSelection(bool isSelected)
@@ -113,9 +124,9 @@ namespace Telesyk.SecuredSource.UI.Controls
 			foreach (FileControl file in PanelFiles.Children)
 				if (file.IsSelected)
 				{
-					FilePack.Remove(file.File);
+					Pack.Remove(file.File);
 
-					ControlStateOperator.Operator.UnregisterForEncryptionProcess(file);
+					ApplicationOperator.Operator.UnregisterForEncryptionProcess(file);
 
 					_selectedFiles.Remove(file.File.FullName.ToUpper());
 				}
@@ -155,25 +166,26 @@ namespace Telesyk.SecuredSource.UI.Controls
 			}
 
 			foreach (var file in files)
-				FilePack.Add(file);
+				Pack.Add(file);
 		}
 
 		private void bindFiles()
 		{
 			PanelFiles.Children.Clear();
 
-			foreach (var file in FilePack)
-			{
-				var control = new FileControl(file, this);
-				PanelFiles.Children.Add(control);
+			if (Pack != null)
+				foreach (var file in Pack)
+				{
+					var control = new FileControl(file, this);
+					PanelFiles.Children.Add(control);
 
-				ControlStateOperator.Operator.RegisterForEncryptionProcess(control);
+					ApplicationOperator.Operator.RegisterForEncryptionProcess(control);
 
-				control.IsSelected = _selectedFiles.Contains(file.FullName.ToUpper());
-				control.SelectionChanged += fileControl_Select;
-			}
+					control.IsSelected = _selectedFiles.Contains(file.FullName.ToUpper());
+					control.SelectionChanged += fileControl_Select;
+				}
 
-			TextFileCount.Text = FilePack.FileCount.ToString();
+			TextFileCount.Text = Pack != null ? $"{Pack.FileCount}" : "0";
 			TextSelectedFileCount.Text = _selectedFiles.Count.ToString();
 		}
 

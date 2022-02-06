@@ -4,10 +4,16 @@ using System.Windows.Controls;
 
 using Telesyk.Cryptography;
 
+using oper = Telesyk.SecuredSource.ApplicationOperator;
+
 namespace Telesyk.SecuredSource.UI.Controls
 {
 	public partial class SelectAlgorithmControl : UserControl
 	{
+		#region Private declarations
+
+		#endregion
+
 		#region Constructors
 
 		public SelectAlgorithmControl()
@@ -19,21 +25,19 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#endregion
 
+		#region Public methods
+
+		#endregion
+
 		#region Public properties
 
 		private ApplicationMode _mode;
 
-		public ApplicationMode Mode 
-		{ 
+		public ApplicationMode Mode
+		{
 			get => _mode;
-			set => _mode = value; 
+			set => _mode = value;
 		}
-
-		//public event EventHandler AlgorithmChanged;
-
-		#endregion
-
-		#region Public events
 
 		//public event EventHandler AlgorithmChanged;
 
@@ -43,26 +47,33 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			SelectAlgorithm.ItemsSource = Enum.GetNames(typeof(CryptoAlgorithm));
+			SelectAlgorithm.ItemsSource = Enum.GetNames(typeof(SymmetricAlgorithmName));
 
-			ControlStateOperator.Operator.RegisterForEncryptionProcess(SelectAlgorithm);
+			oper.Operator.RegisterForEncryptionProcess(SelectAlgorithm);
+
+			if (Mode == ApplicationMode.Decryption)
+				oper.Operator.DeserializePackChanged += (s, a) =>
+				{
+					if (oper.Operator.DeserializePack != null)
+						SelectAlgorithm.SelectedValue = $"{oper.Operator.DeserializePack.FilePack.Algorithm}";
+				};
 		}
 
 		public override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
 
-			SelectAlgorithm.SelectedValue = $"{(Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.Algorithm : ApplicationSettings.Current.DecryptionAlgorithm)}";
+			SelectAlgorithm.SelectedValue = $"{(Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.EncryptionAlgorithm : ApplicationSettings.Current.DecryptionAlgorithm)}";
 		}
 
 		private void changeAlgorythm()
 		{
-			Enum.TryParse(SelectAlgorithm.SelectedValue.ToString(), out CryptoAlgorithm algorythm);
+			Enum.TryParse(SelectAlgorithm.SelectedValue.ToString(), out SymmetricAlgorithmName algorithm);
 
 			if (Mode == ApplicationMode.Encryption)
-				ApplicationSettings.Current.Algorithm = algorythm;
+				ApplicationSettings.Current.SetEncryptionAlgorithm(algorithm);
 			else
-				ApplicationSettings.Current.DecryptionAlgorithm = algorythm;
+				ApplicationSettings.Current.SetDecryptionAlgorithm(algorithm);
 		}
 
 		#region Handlers

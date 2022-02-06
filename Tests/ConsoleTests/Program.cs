@@ -6,10 +6,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
-//using var client = new HttpClient();
-//var content = await client.GetStringAsync("http://webcode.me");
-
-//Console.WriteLine(content);
+using Telesyk.Cryptography;
 
 namespace Tests
 {
@@ -21,16 +18,76 @@ namespace Tests
 
 		static void Main(string[] args)
 		{
-			//createBigText();
+			testStringGen();
+			
+			//writeSizes();
+		}
 
-			var icon = System.Drawing.Icon.ExtractAssociatedIcon("C:\\test.docx");
+		private static void testStringGen()
+		{
+			while (true)
+			{
+				var sentense = CryptographyUtils.GenerateSentence(2048);
 
-			using (FileStream stream = new FileStream("d:\\test.ico", FileMode.Create))
-				icon.Save(stream);
+				Console.WriteLine($"{sentense}");
+				Console.WriteLine();
+				Console.WriteLine($"Symbols: {sentense.Length}");
+				Console.WriteLine($"Letters: {sentense.Split(' ').Length}");
+				Console.WriteLine();
 
-			createArchive();
+				var password = new Password(SymmetricAlgorithmName.RC2, sentense);
 
-			readArchive();
+				Console.WriteLine($"Key hash: {password.Hash}");
+				Console.WriteLine($"Key size: {password.KeySize}");
+				
+				string bytes = null;
+
+				foreach (var byt in password.Key)
+					bytes += (bytes != null ? ", " : "") + byt.ToString();
+
+				Console.WriteLine($"Key bytes: {bytes}");
+				Console.WriteLine();
+
+				Console.WriteLine($"Vector: {password.Vector}");
+				Console.WriteLine($"Vector size: {password.BlockSize}");
+
+				bytes = null;
+
+				foreach (var byt in password.IV)
+					bytes += (bytes != null ? ", " : "") + byt.ToString();
+
+				Console.WriteLine($"Vector bytes: {bytes}");
+
+				Console.ReadLine();
+				Console.Clear();
+			}
+		}
+
+		private static void testKeys2()
+		{
+			//var pk1 = new Password(SymmetricAlgorithmName.Aes, 32, "ВсемПриветКакВсегда");
+			//var pk2 = new Password(SymmetricAlgorithmName.Aes, 32, "ВсемПриветКакВсегда", "ИОстакльнымТоже");
+			//var pk3 = new Password(SymmetricAlgorithmName.Aes, 32);
+			//var pk7 = new Password(SymmetricAlgorithmName.Rijndael, 32, "Без вины виноватые");
+			//var pk9 = new Password(SymmetricAlgorithmName.Rijndael, 32, "Без вины виноватые", "Как всегда");
+			//var pk4 = new Password(SymmetricAlgorithmName.Rijndael, 32);
+			//var pk8 = new Password(SymmetricAlgorithmName.TripleDES, 32, "Без вины виноватые");
+			//var pk10 = new Password(SymmetricAlgorithmName.TripleDES, 32, "Без вины виноватые", "Как всегда");
+			//var pk5 = new Password(SymmetricAlgorithmName.TripleDES, 32); 
+			//var pk6 = new Password(SymmetricAlgorithmName.Aes, 32, "Без вины виноватые");
+			//var pk11 = new Password(SymmetricAlgorithmName.RC2, 1, "Без вины виноватые");
+
+			//Console.ReadLine();
+		}
+
+		private static void testKeys()
+		{
+			//Password s = new Password(SymmetricAlgorithmName.Aes, 32, "Glory to Ukraine! Glory to Heros!");
+			//Console.WriteLine(s.Hash);
+			//Console.WriteLine(s.Vector);
+			//Console.WriteLine($"{s.Core.LegalKeySizes[0].MinSize}-{s.Core.LegalKeySizes[0].MaxSize}-{s.Core.LegalKeySizes[0].SkipSize}");
+			//Console.WriteLine($"{s.Core.LegalBlockSizes[0].MinSize}-{s.Core.LegalBlockSizes[0].MaxSize}-{s.Core.LegalBlockSizes[0].SkipSize}");
+			//Console.ReadLine();
 		}
 
 		private static void readArchive()

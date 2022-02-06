@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-using System.Threading.Tasks;
-
 using Telesyk.Cryptography;
+
+using oper = Telesyk.SecuredSource.ApplicationOperator;
 
 namespace Telesyk.SecuredSource.UI.Controls
 {
@@ -33,13 +32,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		public bool IsPasswordVisible { get; private set; }
 
-		public string Password { get; private set; }
-
-		public byte[] PasswordBytes { get; private set; }
-
-		public byte[] PasswordHashBytes { get; private set; }
-
-		public string PasswordHash { get; private set; }
+		public Password Password { get; set; }
 
 		public ApplicationMode Mode { get; set; }
 
@@ -47,9 +40,11 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#region Public events
 
-		public event ValueProcessedEventHandler<string> PasswordChanged;
+		#endregion
 
-		public event ValueProcessedEventHandler<string> PasswordHashChanged;
+		#region Overridies
+
+		public override void OnApplyTemplate() => onApplyTemplate();
 
 		#endregion
 
@@ -57,50 +52,21 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			ControlStateOperator.Operator.RegisterForEncryptionProcess(PasswordValue, TextValue);
+			oper.Operator.RegisterForEncryptionProcess(PasswordValue, TextValue);
+
+			TextValue.TextChanged += (s, a) => setPassword(() => PasswordValue.Password = TextValue.Text);
+			PasswordValue.PasswordChanged += (s, a) => setPassword(() => TextValue.Text = PasswordValue.Password);
+			TextPasswordHintEdit.TextChanged += (s, a) => updatePassword();
 		}
 
-		public override void OnApplyTemplate()
+		private void algorithmChanged()
 		{
-			base.OnApplyTemplate();
-
-			ensureMode();
-		}
-
-		private void ensureMode ()
-		{
-			displayCurrentPasswordLength();
+			updatePassword();
 
 			if (Mode == ApplicationMode.Encryption)
-			{
-				TextValue.MaxLength = PasswordValue.MaxLength = ApplicationSettings.Current.RequiredPasswordLength;
-
-				displayRequiredPasswordLength();
-
-				ApplicationSettings.Current.AlgorithmChanged += ApplicationSettings_AlgorithmChanged;
-			}
+				ApplicationSettings.Current.SetEncryptionPassword(Password);
 			else
-			{
-				TextValue.MaxLength = PasswordValue.MaxLength = 32;
-				TextLengthSeparator.Text = TextRequiredLength.Text = null;
-			}
-		}
-
-		private void displayCurrentPasswordLength()
-		{	
-			TextLength.Text = $"{(Password ?? string.Empty).Length}";
-		}
-
-		private void displayRequiredPasswordLength()
-		{
-			TextValue.MaxLength = PasswordValue.MaxLength = ApplicationSettings.Current.PasswordSize.MaxSize;
-			TextRequiredLength.Text = null;
-
-			if (ApplicationSettings.Current.PasswordSize.Skip != 1)
-				for (var i = 0; i < ApplicationSettings.Current.PasswordSize.Quantity; i++)
-					TextRequiredLength.Text += $"{(i > 0 ? "," : null)}{ApplicationSettings.Current.PasswordSize[i]}";
-			else
-				TextRequiredLength.Text = $"{ApplicationSettings.Current.PasswordSize.MinSize}-{ApplicationSettings.Current.PasswordSize.MaxSize}";
+				ApplicationSettings.Current.SetDecryptionPassword(Password);
 		}
 
 		private void setPassword(Func<string> func)
@@ -109,22 +75,67 @@ namespace Telesyk.SecuredSource.UI.Controls
 			{
 				_skipChange = true;
 
-				Password = func();
+				func();
 
-				PasswordBytes = Encoding.UTF8.GetBytes(Password);
-				PasswordHashBytes = SymmetricEncryptor.ComputeHash(PasswordBytes);
-				PasswordHash = Convert.ToBase64String(PasswordBytes);
-
-				displayCurrentPasswordLength();
-
-				if (Mode == ApplicationMode.Encryption)
-					ApplicationSettings.Current.PasswordLength = Password.Length;
-
-				PasswordChanged?.Invoke(this, new ValueProcessedEventArgs<string>(Password));
-				PasswordHashChanged?.Invoke(this, new ValueProcessedEventArgs<string>(PasswordHash));
+				updatePassword();
 			}
 			else
 				_skipChange = false;
+		}
+
+		private void updatePassword()
+		{
+			var algoritm = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.EncryptionAlgorithm : ApplicationSettings.Current.DecryptionAlgorithm;
+
+			if (Mode == ApplicationMode.Encryption)
+			{
+				Password = new Password(algoritm, TextValue.Text, TextPasswordHintEdit.Text);
+
+				ApplicationSettings.Current.SetEncryptionPassword(Password);
+			}
+			else
+			{
+				Password = new Password(algoritm, TextValue.Text);
+
+				ApplicationSettings.Current.SetDecryptionPassword(Password);
+			}
+
+			displayCurrentPasswordLength();
+		}
+
+		private void onApplyTemplate()
+		{
+			base.OnApplyTemplate();
+
+			if (Mode == ApplicationMode.Decryption)
+			{
+				TextPasswordHintHeader.Visibility = TextPasswordHintEdit.Visibility = Visibility.Collapsed;
+
+				ApplicationSettings.Current.DecryptionAlgorithmChanged += ApplicationSettings_AlgorithmChanged;
+
+				oper.Operator.DeserializePackChanged += (s, a) =>
+				{
+					if (oper.Operator.DeserializePack != null && oper.Operator.DeserializePack.IsValid && oper.Operator.DeserializePack.FilePack.Password.Hint != null)
+					{
+						TextPasswordHintHeader.Visibility = TextPasswordHint.Visibility = Visibility.Visible;
+						TextPasswordHint.Text = a.Value.FilePack.Password.Hint;
+					}
+					else
+						TextPasswordHintHeader.Visibility = TextPasswordHint.Visibility = Visibility.Collapsed;
+				};
+			}
+			else
+				ApplicationSettings.Current.EncryptionAlgorithmChanged += ApplicationSettings_AlgorithmChanged;
+		}
+
+		private void ensureMode()
+		{
+			displayCurrentPasswordLength();
+		}
+
+		private void displayCurrentPasswordLength()
+		{	
+			TextPasswordLength.Text = $"{Password.SymbolCount}";
 		}
 
 		private void passwordVisibilityChanged()
@@ -133,13 +144,13 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 			if (IsPasswordVisible)
 			{
-				ImageVisibility.Style = (Style)FindResource("UnvisiblePasswordImage");
+				ImageVisibility.Style = (Style)FindResource("VisiblePasswordImage");
 				TextValue.Visibility = Visibility.Visible;
 				PasswordValue.Visibility = Visibility.Collapsed;
 			}
 			else
 			{
-				ImageVisibility.Style = (Style)FindResource("UnvisiblePasswordImage"); ;
+				ImageVisibility.Style = (Style)FindResource("PasswordImage"); 
 				TextValue.Visibility = Visibility.Collapsed;
 				PasswordValue.Visibility = Visibility.Visible;
 			}
@@ -153,7 +164,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void ImageVisibility_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => passwordVisibilityChanged();
 
-		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e) => displayRequiredPasswordLength();
+		private void ApplicationSettings_AlgorithmChanged(object sender, EventArgs e) => algorithmChanged();
 
 		#endregion
 

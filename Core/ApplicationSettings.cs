@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
 using System.IO;
 using System.Xml;
 
-using Telesyk;
 using Telesyk.Cryptography;
 
 namespace Telesyk.SecuredSource
@@ -15,11 +11,10 @@ namespace Telesyk.SecuredSource
 		#region Private declarations
 		
 		private static Lazy<ApplicationSettings> _instance = new Lazy<ApplicationSettings>(() => new ApplicationSettings());
-		private Dictionary<CryptoAlgorithm, PasswordSize> _passwordSizes = new Dictionary<CryptoAlgorithm, PasswordSize>();
-
+	
 		#region Constants
 
-		private const string _APPDIRECTORY_PATH = "Telesyk/SecuredSource";
+		private const string _APPDIRECTORY_PATH = "Telesyk/Enigma";
 		private const string _SETTINGS_FILE = "settings.config";
 		private const string _NODENAME_WINDOW_WIDTH = "window-width";
 		private const string _NODENAME_WINDOW_HEIGHT = "window-height";
@@ -27,41 +22,30 @@ namespace Telesyk.SecuredSource
 		private const string _NODENAME_WINDOW_LEFT = "window-left";
 		private const string _NODENAME_MODE = "mode";
 		private const string _NODENAME_PANEL_WIDTH = "panel-width";
-		private const string _NODENAME_DIRECTORY = "directory";
+		private const string _NODENAME_ENCRYPTION_DIRECTORY = "directory";
 		private const string _NODENAME_FILE_NAME = "file-name";
-		private const string _NODENAME_ALGORITHM = "algorythm";
+		private const string _NODENAME_ALGORITHM = "algorithm";
 		private const string _NODENAME_DECRYPTION_DIRECTORY = "decryption-directory";
 		private const string _NODENAME_DECRYPTION_PACK_PATH = "decryption-pack-path";
-		private const string _NODENAME_DECRYPTION_ALGORITHM = "decryption-algorythm";
+		private const string _NODENAME_DECRYPTION_ALGORITHM = "decryption-algorithm";
 		private const string _NODENAME_REQUIRED_PASSWORD_LENGTH = "required-password-length";
-		//private const string _NODENAME_AES_PASSWORD_LENGTH = "aes-password-length";
-		//private const string _NODENAME_RIJNDAEL_PASSWORD_LENGTH = "rijndael-password-length";
-		//private const string _NODENAME_DES_PASSWORD_LENGTH = "des-password-length";
-		//private const string _NODENAME_TRIPLEDES_PASSWORD_LENGTH = "tripledes-password-length";
-		//private const string _NODENAME_RC5_PASSWORD_LENGTH = "rc5-password-length";
 
 		#endregion
 
 		private ApplicationMode _mode = ApplicationMode.Decryption;
-		private CryptoAlgorithm _algorithm = CryptoAlgorithm.RC2;
+		private SymmetricAlgorithmName _encryptionAlgorithm = SymmetricAlgorithmName.Aes;
+		private SymmetricAlgorithmName _decryptionAlgorithm = SymmetricAlgorithmName.Aes;
 		private int _windowWidth = 600;
 		private int _windowHeight = 420;
 		private int _windowTop = 200;
 		private int _windowLeft = 400;
 		private int _panelWidth = 160;
-		private string _directory = null;
+		private string _encryptionDirectory = null;
 		private string _fileName = null;
 		private int _requiredPasswordLength = 16;
-		private int _passwordLength;
 		private int _fileQuantity;
 		private string _decryptionPackPath;
 		private string _decryptionDirectory;
-		private CryptoAlgorithm _decryptionAlgorithm = CryptoAlgorithm.RC2;
-		//private int _aesPasswordLength = 16;
-		//private int _rijndaelPasswordLength = 16;
-		//private int _desPasswordLength = 8;
-		//private int _tripleDesPasswordLength = 16;
-		//private int _rc2PasswordLength = 5;
 
 		#endregion
 
@@ -80,22 +64,43 @@ namespace Telesyk.SecuredSource
 
 		internal XmlDocument SettingsXml { get; private set; }
 
+		internal Password EncryptionPassword { get; private set; }
+
+		internal Password DecryptionPassword { get; private set; }
+
 		#endregion
 
 		#region Public properties
 
 		public static ApplicationSettings Current { get => _instance.Value; }
 
+		public string AppVersion { get; set; }
+
 		public ApplicationMode Mode
 		{
 			get { return _mode; }
-			set { _mode = writeSettingValue(_NODENAME_MODE, value); }
+			set { _mode = setMode(value); }
 		}
 
-		public CryptoAlgorithm Algorithm
+		public SymmetricAlgorithmName EncryptionAlgorithm { get => _encryptionAlgorithm; }
+
+		public SymmetricAlgorithmName DecryptionAlgorithm { get => _decryptionAlgorithm; }
+
+		public string EncryptionDirectory
 		{
-			get => _algorithm;
-			set { changeAlgorithm(value); }
+			get => _encryptionDirectory;
+			set { _encryptionDirectory = writeSettingValue(_NODENAME_ENCRYPTION_DIRECTORY, value); }
+		}
+
+		public string DecryptionDirectory
+		{
+			get => _decryptionDirectory;
+			set
+			{
+				_decryptionDirectory = writeSettingValue(_NODENAME_DECRYPTION_DIRECTORY, value);
+
+				DecryptionDirectoryChanged?.Invoke(this, EventArgs.Empty);
+			}
 		}
 
 		public int WindowWidth
@@ -128,28 +133,10 @@ namespace Telesyk.SecuredSource
 			set { _panelWidth = writeSettingValue(_NODENAME_PANEL_WIDTH, value); }
 		}
 
-		public string Directory
-		{
-			get => _directory;
-			set { _directory = writeSettingValue(_NODENAME_DIRECTORY, value); }
-		}
-
 		public string FileName
 		{
 			get => _fileName;
 			set { _fileName = writeSettingValue(_NODENAME_FILE_NAME, value); }
-		}
-
-		public int RequiredPasswordLength
-		{
-			get => _requiredPasswordLength;
-			set { _requiredPasswordLength = writeSettingValue(_NODENAME_REQUIRED_PASSWORD_LENGTH, value); }
-		}
-
-		public int PasswordLength 
-		{	
-			get => _passwordLength; 
-			set { changePasswordLength(value); }
 		}
 
 		public int FileQuantity
@@ -158,56 +145,39 @@ namespace Telesyk.SecuredSource
 			set { changeFileQuantity(value); }
 		}
 
-		public string DecryptionPackPath 
-		{ 
-			get => _decryptionPackPath; 
-			set
-			{
-				_decryptionPackPath = writeSettingValue(_NODENAME_DECRYPTION_PACK_PATH, value);
-
-				DecryptionPackPathChanged?.Invoke(this, EventArgs.Empty);
-			}
-		}
-
-		public string DecryptionDirectory 
-		{ 
-			get => _decryptionDirectory; 
-			set
-			{
-				_decryptionDirectory = writeSettingValue(_NODENAME_DECRYPTION_DIRECTORY, value);
-
-				DecryptionDirectoryChanged?.Invoke(this, EventArgs.Empty);
-			}
-		}
-
-		public CryptoAlgorithm DecryptionAlgorithm
-		{
-			get => _decryptionAlgorithm;
-			set
-			{ 
-				_decryptionAlgorithm = writeSettingValue(_NODENAME_DECRYPTION_ALGORITHM, value);
-
-				DecryptionAlgorithmChanged?.Invoke(this, EventArgs.Empty);
-			}
-		}
-
-		public PasswordSize PasswordSize => getPasswordSize(Algorithm);
+		public string DecryptionPackFilePath { get; set; }
 
 		#endregion
 
-		#region Public methods
+		#region Internal methods
+
+		public void SetEncryptionPassword(Password password)
+			=> setEncryptionPassword(password);
+
+		public void SetDecryptionPassword(Password password)
+			=> setDecryptionPassword(password);
+
+		public void SetEncryptionAlgorithm(SymmetricAlgorithmName algorithm)
+			=> setEncryptionAlgorithm(algorithm);
+
+		public void SetDecryptionAlgorithm(SymmetricAlgorithmName algorithm)
+			=> setDecryptionAlgorithm(algorithm);
 
 		#endregion
 
 		#region Events
 
-		public event EventHandler AlgorithmChanged;
+		public event EventHandler ModeChanged;
 
-		public event EventHandler PasswordChanged;
+		public event EventHandler EncryptionAlgorithmChanged;
+
+		public event EventHandler EncryptionPasswordChanged;
+
+		public event EventHandler DecryptionPasswordChanged;
 
 		public event EventHandler FileQuantityChanged;
 
-		public event EventHandler DecryptionPackPathChanged;
+		public event EventHandler DecryptionPackChanged;
 
 		public event EventHandler DecryptionDirectoryChanged;
 
@@ -238,15 +208,16 @@ namespace Telesyk.SecuredSource
 			readIntegerSetting(_NODENAME_WINDOW_TOP, ref _windowTop);
 			readIntegerSetting(_NODENAME_WINDOW_LEFT, ref _windowLeft);
 			readIntegerSetting(_NODENAME_PANEL_WIDTH, ref _panelWidth);
-			readStringSetting(_NODENAME_DIRECTORY, ref _directory);
+			readStringSetting(_NODENAME_ENCRYPTION_DIRECTORY, ref _encryptionDirectory);
 			readStringSetting(_NODENAME_FILE_NAME, ref _fileName);
 			readStringSetting(_NODENAME_DECRYPTION_PACK_PATH, ref _decryptionPackPath);
 			readStringSetting(_NODENAME_DECRYPTION_DIRECTORY, ref _decryptionDirectory);
-			readEnumSetting<CryptoAlgorithm>(_NODENAME_ALGORITHM, ref _algorithm);
-			readEnumSetting<CryptoAlgorithm>(_NODENAME_DECRYPTION_ALGORITHM, ref _decryptionAlgorithm);
+			readEnumSetting<SymmetricAlgorithmName>(_NODENAME_ALGORITHM, ref _encryptionAlgorithm);
+			readEnumSetting<SymmetricAlgorithmName>(_NODENAME_DECRYPTION_ALGORITHM, ref _decryptionAlgorithm);
 			readIntegerSetting(_NODENAME_REQUIRED_PASSWORD_LENGTH, ref _requiredPasswordLength);
 
-			_directory = !string.IsNullOrEmpty(_directory) ? _directory : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+			_encryptionDirectory = !string.IsNullOrEmpty(_encryptionDirectory) ? _encryptionDirectory : Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+			_decryptionDirectory = !string.IsNullOrEmpty(_decryptionDirectory) ? _decryptionDirectory : Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 		}
 
 		#endregion
@@ -343,10 +314,9 @@ namespace Telesyk.SecuredSource
 			writeSettingValue(_NODENAME_WINDOW_TOP, WindowTop, true);
 			writeSettingValue(_NODENAME_WINDOW_LEFT, WindowLeft, true);
 			writeSettingValue(_NODENAME_PANEL_WIDTH, PanelWidth, true);
-			writeSettingValue(_NODENAME_DIRECTORY, Directory, true);
+			writeSettingValue(_NODENAME_ENCRYPTION_DIRECTORY, EncryptionDirectory, true);
 			writeSettingValue(_NODENAME_FILE_NAME, FileName, true);
-			writeSettingValue(_NODENAME_ALGORITHM, Algorithm, true);
-			writeSettingValue(_NODENAME_REQUIRED_PASSWORD_LENGTH, RequiredPasswordLength, true);
+			writeSettingValue(_NODENAME_ALGORITHM, EncryptionAlgorithm, true);
 
 			SettingsXml.Save(XmlFilePath);
 		}
@@ -398,66 +368,52 @@ namespace Telesyk.SecuredSource
 
 		#endregion
 
-		#region Password sizes
+		#region Password
 
-		private PasswordSize getPasswordSize(CryptoAlgorithm algorithm)
+		private void setEncryptionAlgorithm(SymmetricAlgorithmName algorithm)
 		{
-			if (!_passwordSizes.ContainsKey(algorithm))
-			{
-				var size = createSize(algorithm);
-				_passwordSizes.Add(size.Algorithm, size);
+			_encryptionAlgorithm = writeSettingValue(_NODENAME_ALGORITHM, algorithm);
 
-				return size;
-			}
-
-			return _passwordSizes[algorithm];
+			EncryptionAlgorithmChanged?.Invoke(this, EventArgs.Empty);
 		}
 
-		private PasswordSize createSize(CryptoAlgorithm algorithm)
+		private void setDecryptionAlgorithm(SymmetricAlgorithmName algorithm)
 		{
-			switch(algorithm)
-			{
-				case CryptoAlgorithm.Aes:
-					return new PasswordSize(CryptoAlgorithm.Aes, 16, 32, 8);
-				case CryptoAlgorithm.Rijndael:
-					return new PasswordSize(CryptoAlgorithm.Rijndael, 16, 32, 8);
-				case CryptoAlgorithm.DES:
-					return new PasswordSize(CryptoAlgorithm.DES, 8, 8, 0);
-				case CryptoAlgorithm.TripleDES:
-					return new PasswordSize(CryptoAlgorithm.TripleDES, 16, 24, 8);		
-			}
+			_decryptionAlgorithm = writeSettingValue(_NODENAME_DECRYPTION_ALGORITHM, algorithm);
 
-			return new PasswordSize(CryptoAlgorithm.RC2, 5, 128, 1);
+			DecryptionAlgorithmChanged?.Invoke(this, EventArgs.Empty);
+		}
+
+		private void setEncryptionPassword(Password password)
+		{
+			EncryptionPassword = password;
+
+			EncryptionPasswordChanged?.Invoke(this, EventArgs.Empty);
+		}
+
+		private void setDecryptionPassword(Password password)
+		{
+			DecryptionPassword = password;
+
+			DecryptionPasswordChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		#endregion
 
-		private void changeAlgorithm(CryptoAlgorithm algorithm)
+		private ApplicationMode setMode(ApplicationMode mode)
 		{
-			_algorithm = writeSettingValue(_NODENAME_ALGORITHM, algorithm);
+			writeSettingValue(_NODENAME_MODE, mode);
 
-			if (PasswordLength > 0 && PasswordSize.MaxSize > RequiredPasswordLength & PasswordSize.MaxSize > PasswordLength)
-			{
-				for (var i = 0; i < PasswordSize.Quantity; i++)
-					if (ApplicationSettings.Current.PasswordSize[i] >= RequiredPasswordLength && ApplicationSettings.Current.PasswordSize[i] >= PasswordLength)
-					{
-						RequiredPasswordLength = ApplicationSettings.Current.PasswordSize[i];
-						break;
-					}
-			}
-			else
-				_requiredPasswordLength = PasswordSize.MaxSize;
+			ModeChanged?.Invoke(this, EventArgs.Empty);
 
-			if (AlgorithmChanged != null)
-				AlgorithmChanged(this, new ValueProcessedEventArgs<CryptoAlgorithm>(Algorithm));
+			return mode;
 		}
 
-		private void changePasswordLength(int value)
+		private void changeDecryptionPack(string filePath)
 		{
-			_passwordLength = value;
-			
-			if (PasswordChanged != null)
-				PasswordChanged(this, new ValueProcessedEventArgs<int>(PasswordLength));
+			_decryptionPackPath = writeSettingValue(_NODENAME_DECRYPTION_PACK_PATH, filePath);
+
+			DecryptionPackChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void changeFileQuantity(int value)

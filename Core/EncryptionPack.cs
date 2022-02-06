@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 using Telesyk.Cryptography;
@@ -12,34 +9,26 @@ namespace Telesyk.SecuredSource
 {
 	public sealed class EncryptionPack
 	{
-		#region Private declarations
-
-		private long _totalByteComplitted;
-		private string _password;
-
-		#endregion
-
 		#region Constructors
 
-		private EncryptionPack(string filePath, string password, ApplicationMode mode, PackData filePackData, string outputPath)
+		private EncryptionPack(string filePath, ApplicationMode mode, PackData pack, string outputPath)
 		{
 			FilePath = filePath;
 			Mode = mode;
 			OutputPath = outputPath;
-			FilePack = filePackData;
-			PasswordBytes = Encoding.UTF8.GetBytes(password);
+			FilePack = pack;
 
 			init();
 		}
 
-		public EncryptionPack(string filePath, string password, PackData filePackData)
-			: this(filePath, password, ApplicationMode.Encryption, filePackData, null)
+		public EncryptionPack(string filePath, PackData filePackData)
+			: this(filePath, ApplicationMode.Encryption, filePackData, null)
 		{
-			
+
 		}
 
-		public EncryptionPack(string filePath, string password, string outputPath)
-			: this(filePath, password, ApplicationMode.Decryption, null, outputPath)
+		public EncryptionPack(string filePath, string outputPath)
+			: this(filePath, ApplicationMode.Decryption, null, outputPath)
 		{
 		}
 
@@ -51,19 +40,17 @@ namespace Telesyk.SecuredSource
 
 		public PackData FilePack { get; private set; }
 
-		public string FilePath { get; private set; }
+		public Exception Error { get; private set; }
 
-		public byte[] PasswordBytes { get; private set; }
-	
-		public string PasswordHash { get; private set; }
+		public ReadOnlyCollection<Exception> Errors { get; private set; }
+
+		public string FilePath { get; private set; }
 
 		public string OutputPath { get; private set; }
 
 		public long TotalBytes { get; private set; }
 
-		public AggregateException Exception { get; private set; }
-
-		public long CurrentByteComplitted { get; private set; }
+		public bool SerializeFilePackToBase64 { get; set; }
 
 		public bool IsFinished { get; private set; }
 
@@ -75,16 +62,7 @@ namespace Telesyk.SecuredSource
 
 		public bool IsValid { get; private set; }
 
-		public long BytesComplitted
-		{
-			get => _totalByteComplitted + CurrentByteComplitted;
-			private set
-			{
-				_totalByteComplitted = value;
-
-				CurrentByteComplitted = 0;
-			}
-		}
+		public long BytesComplitted { get; private set; }
 
 		#endregion
 
@@ -106,8 +84,6 @@ namespace Telesyk.SecuredSource
 
 		#region Public events
 
-		//public event ProgressEventHandler Progress;
-
 		public event ValueProcessedEventHandler<int> Processed;
 
 		public event EventHandler Finished;
@@ -120,27 +96,22 @@ namespace Telesyk.SecuredSource
 
 		#endregion
 
-		#region Interface implementations
-
-		//public void Dispose()
-		//{
-
-		//}
-
-		#endregion
-
 		#region Private methods
 
 		private void init()
 		{
-			if (PasswordBytes != null)
-				PasswordHash = Convert.ToBase64String(PasswordBytes);
+			if (Mode == ApplicationMode.Decryption)
+				read();
 		}
 
 		private void resetForStart()
 		{
 			IsFinished = IsCompleted = IsCanceled = IsFaulted = false;
-			Exception = null;
+
+			BytesComplitted = 0;
+
+			Error = null;
+			Errors = null;
 		}
 
 		private void cancel()
@@ -151,26 +122,30 @@ namespace Telesyk.SecuredSource
 				encryptor.Cancel();
 		}
 
+		private void read()
+		{
+			resetForStart();
+			
+			try { readMetaData(); }
+			catch (Exception error) { Error = error; }
+		}
+
 		private void readMetaData()
 		{
-			try
+			using (Encryptor = SymmetricEncryptor.CreateDecryptor(FilePath, ApplicationSettings.Current.DecryptionAlgorithm, ApplicationSettings.Current.DecryptionPassword))
 			{
-				using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Open, ApplicationSettings.Current.DecryptionAlgorithm, PasswordBytes))
-				{
-					Encryptor.Processed += Encryptor_Processed;
+				Errors = Encryptor.Errors;
+				
+				var length = Encryptor.Read();
 
-					var length = Encryptor.Read();
+				byte[] bytes = Encryptor.Read(length);
 
-					byte[] bytes = Encryptor.Read(length);
+				FilePack = PackData.Deserialize(bytes);
 
-					FilePack = PackData.Deserialize(bytes);
+				TotalBytes = 4 + bytes.Length + FilePack.TotalBytes;
 
-					TotalBytes = 4 + bytes.Length + FilePack.TotalBytes;
-
-					IsValid = true;
-				}
+				IsValid = true;
 			}
-			catch { }
 		}
 
 		private async void serialize()
@@ -183,9 +158,9 @@ namespace Telesyk.SecuredSource
 
 			Task task = null;
 
-			ControlStateOperator.Operator.DisableForEncryptionProcess();
+			ApplicationOperator.Operator.DisableForEncryptionProcess();
 
-			using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Create, ApplicationSettings.Current.Algorithm, PasswordBytes))
+			using (Encryptor = SymmetricEncryptor.CreateEncryptor(FilePath, ApplicationSettings.Current.EncryptionAlgorithm, ApplicationSettings.Current.EncryptionPassword))
 			{
 				Encryptor.Processed += Encryptor_Processed;
 
@@ -193,10 +168,12 @@ namespace Telesyk.SecuredSource
 
 				await (task = Task.Run(() => Encryptor.WriteAsync(pack)));
 
+				processed(4 + pack.Length);
+
 				foreach (var file in FilePack)
 					await (task = Task.Run(() => Encryptor.EncryptAsync(file.FullName)));
 
-				Exception = task.Exception;
+				Error = task.Exception;
 
 				IsFinished = true;
 
@@ -205,7 +182,7 @@ namespace Telesyk.SecuredSource
 				IsFaulted = task.IsFaulted;
 			}
 
-			ControlStateOperator.Operator.EnableForEncryptionProcess();
+			ApplicationOperator.Operator.EnableForEncryptionProcess();
 
 			if (Finished != null)
 				Finished(this, EventArgs.Empty);
@@ -224,9 +201,9 @@ namespace Telesyk.SecuredSource
 		{
 			resetForStart();
 
-			ControlStateOperator.Operator.DisableForEncryptionProcess();
+			ApplicationOperator.Operator.DisableForEncryptionProcess();
 
-			using (Encryptor = new SymmetricEncryptor(FilePath, FileMode.Open, ApplicationSettings.Current.DecryptionAlgorithm, PasswordBytes))
+			using (Encryptor = SymmetricEncryptor.CreateDecryptor(FilePath, ApplicationSettings.Current.DecryptionAlgorithm, ApplicationSettings.Current.DecryptionPassword))
 			{
 				Encryptor.Processed += Encryptor_Processed;
 
@@ -240,12 +217,14 @@ namespace Telesyk.SecuredSource
 				
 				TotalBytes = 4 + taskBytes.Result.LongLength + FilePack.TotalBytes;
 
+				processed(4 + (int)taskBytes.Result.LongLength);
+
 				Task taskFile = null;
 
 				foreach (var file in FilePack)
 					await (taskFile = Task.Run(() => Encryptor.DecryptAsync(Path.Combine(OutputPath, file.Name), file.ByteCount)));
 
-				Exception = taskFile.Exception;
+				Error = taskFile.Exception;
 
 				IsFinished = true;
 
@@ -254,7 +233,9 @@ namespace Telesyk.SecuredSource
 				IsFaulted = taskFile.IsFaulted;
 			}
 
-			ControlStateOperator.Operator.EnableForEncryptionProcess();
+			processed((int)TotalBytes);
+
+			ApplicationOperator.Operator.EnableForEncryptionProcess();
 
 			if (Finished != null)
 				Finished(this, EventArgs.Empty);
@@ -269,7 +250,7 @@ namespace Telesyk.SecuredSource
 				Faulted(this, EventArgs.Empty);
 		}
 
-		private void encryptorProcessed(int bytesComplitted)
+		private void processed(int bytesComplitted)
 		{
 			if (Processed != null)
 			{
@@ -281,7 +262,7 @@ namespace Telesyk.SecuredSource
 
 		#region Handlers
 
-		private void Encryptor_Processed(object sender, ValueProcessedEventArgs<int> args) => encryptorProcessed(args.Value);
+		private void Encryptor_Processed(object sender, ValueProcessedEventArgs<int> args) => processed(args.Value);
 
 		#endregion
 

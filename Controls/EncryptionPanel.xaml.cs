@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 
-using Telesyk.Cryptography;
-
 namespace Telesyk.SecuredSource.UI.Controls
 {
 	public partial class EncryptionPanelControl : UserControl
@@ -19,19 +17,7 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		#endregion
 
-		#region Public properties
-
-		public string Password => ControlPassword.Password ?? String.Empty;
-
-		public byte[] PasswordBytes => ControlPassword.PasswordBytes;
-
-		public byte[] PasswordHashBytes => ControlPassword.PasswordHashBytes;
-
-		public string PasswordHash => ControlPassword.PasswordHash;
-
-		#endregion
-
-		#region Public methods
+		#region Overridies
 
 		#endregion
 
@@ -39,12 +25,12 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			ControlPassword.Mode = ApplicationMode.Encryption;
+			ControlEncryptionPassword.Mode = ApplicationMode.Encryption;
 
 			TextFileName.Text = ApplicationSettings.Current.FileName;
 			TextFileName.TextChanged += (s, a) => ApplicationSettings.Current.FileName = TextFileName.Text;
 
-			ControlStateOperator.Operator.RegisterForEncryptionProcess(TextFileName);
+			ApplicationOperator.Operator.RegisterForEncryptionProcess(TextFileName);
 		}
 
 		#endregion

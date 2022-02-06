@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
 using Telesyk.SecuredSource.Globalization;
 using Telesyk.SecuredSource.UI.Controls;
+
+using oper = Telesyk.SecuredSource.ApplicationOperator;
 
 namespace Telesyk.SecuredSource.UI
 {
@@ -14,6 +19,7 @@ namespace Telesyk.SecuredSource.UI
 		#region Private declarations
 
 		private ApplicationMode _mode = ApplicationMode.Decryption;
+		private bool _skipModeChangingReaction = false;
 
 		#endregion
 
@@ -33,14 +39,14 @@ namespace Telesyk.SecuredSource.UI
 		public ApplicationMode Mode
 		{
 			get { return _mode; }
-			private set { ensureMode(value); }
+			private set { setMode(value); }
 		}
 
-		public DecryptionPanelControl SimpleAndFastPanel { get; private set; }
+		public DecryptionPanelControl DecryptionPanel { get; private set; }
 
 		public DecryptionAreaControl DecryptionArea { get; private set; } = new DecryptionAreaControl();
 
-		public EncryptionPanelControl MoreFeaturesPanel { get; private set; }
+		public EncryptionPanelControl EncryptionPanel { get; private set; }
 
 		public EncryptionAreaControl EncryptionArea { get; private set; } = new EncryptionAreaControl();
 
@@ -50,58 +56,78 @@ namespace Telesyk.SecuredSource.UI
 
 		private void init()
 		{
+			ApplicationSettings.Current.AppVersion = $"{Assembly.GetExecutingAssembly().GetName().Version}";
+
+			oper.Operator.InitStartUpFile();
+
 			Mode = ApplicationSettings.Current.Mode;
 
-			SimpleAndFastPanel = DecryptionArea.Panel;
-			MoreFeaturesPanel = EncryptionArea.Panel;
+			DecryptionPanel = DecryptionArea.Panel;
+			EncryptionPanel = EncryptionArea.Panel;
 
 			DecryptionArea.Host = this;
 			EncryptionArea.Host = this;
 
 			var textVersion = ((Run)FindName("textVersion"));
-			textVersion.ToolTip = textVersion.Text = ((AssemblyFileVersionAttribute)Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyFileVersionAttribute), false)[0]).Version;
 
+			textVersion.ToolTip = textVersion.Text = ApplicationSettings.Current.AppVersion;
+			
 			Width = ApplicationSettings.Current.WindowWidth;
 			Height = ApplicationSettings.Current.WindowHeight;
 			Top = ApplicationSettings.Current.WindowTop;
 			Left = ApplicationSettings.Current.WindowLeft;
 
-			ControlStateOperator.Operator.RegisterForEncryptionProcess(RadioEncryption, RadioDecryption);
+			oper.Operator.RegisterForEncryptionProcess(RadioEncryption, RadioDecryption);
+
+			initLanguage();
 		}
 
-		private void ensureMode(ApplicationMode mode)
+		private void initLanguage()
 		{
-			_mode = ApplicationSettings.Current.Mode = mode;
+			var lang = Thread.CurrentThread.CurrentUICulture.ThreeLetterWindowsLanguageName.ToUpper();
+			var index = 1;
 
-			switch (Mode)
+			if (lang == "UKR")
+				index = 0;
+			else if (lang == "RUS")
+				index = 2;
+
+			SelectLanguage.SelectedIndex = index;
+
+			SelectLanguage.SelectionChanged += (s, a) =>
 			{
-				case ApplicationMode.Decryption:
-					RadioDecryption.IsChecked = true;
-					break;
-				case ApplicationMode.Encryption:
-					RadioEncryption.IsChecked = true;
-					break;
-			}
+				var name = "en-US";
 
-			ensureAreaControl();
+				if (SelectLanguage.SelectedIndex == 0)
+					name = "uk-UA";
+				else if (SelectLanguage.SelectedIndex == 2)
+					name = "ru-RU";
+
+				Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(name);
+
+				new MainWindow().Show();
+
+				Close();
+			};
 		}
 
-		private void ensureAreaControl()
+		private void setMode(ApplicationMode mode)
 		{
-			UserControl controlArea = null;
+			_mode = mode;
+
+			ApplicationSettings.Current.Mode = Mode;
 			
-			switch(Mode)
-			{
-				case ApplicationMode.Decryption:
-					controlArea = DecryptionArea;
-					break;
-				case ApplicationMode.Encryption:
-					controlArea = EncryptionArea;
-					break;
-			}
+			if (Mode == ApplicationMode.Decryption && !(RadioDecryption.IsChecked ?? false))
+				RadioDecryption.IsChecked = true;
+
+			if (Mode == ApplicationMode.Encryption && !(RadioEncryption.IsChecked ?? false))
+				RadioEncryption.IsChecked = true;
 
 			ControlMainArea.Children.Clear();
-			ControlMainArea.Children.Add(controlArea);
+			ControlMainArea.Children.Add(mode == ApplicationMode.Decryption ? (UserControl)DecryptionArea : EncryptionArea);
+
+			if (mode == ApplicationMode.Decryption)
+				oper.Operator.LoadDeserializePack(ApplicationSettings.Current.DecryptionPackFilePath);
 		}
 
 		#region Handlers
@@ -110,12 +136,26 @@ namespace Telesyk.SecuredSource.UI
 		{
 			Enum.TryParse<ApplicationMode>(((RadioButton)e.Source).Name.Substring(5), out ApplicationMode mode);
 
-			Mode = mode;
+			if (Mode != mode)
+				Mode = mode;
 		}
 
 		private void TextBlock_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
 		{
-			MessageBox.Show(Strings.InfoDialog);
+			var datas = Strings.InfoDialog.Split('|');
+
+			string text = string.Empty;
+
+			foreach (var data in datas)
+				text += $"{data}{Environment.NewLine}";
+			
+			text += Environment.NewLine + Environment.NewLine + Strings.Enigma;
+			text += Environment.NewLine + Environment.NewLine + Strings.EnigmaLinkText;
+
+			var result = MessageBox.Show(text, Strings.Title, MessageBoxButton.YesNo);
+
+			if (result == MessageBoxResult.Yes)
+				Process.Start(Strings.EnigmaLink);
 		}
 
 		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

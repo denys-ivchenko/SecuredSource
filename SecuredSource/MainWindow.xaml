@@ -15,13 +15,21 @@
 			<RowDefinition />
 			<RowDefinition Height="17" />
 		</Grid.RowDefinitions>
-		<StackPanel Grid.Row="0" Panel.ZIndex="5" Style="{StaticResource Header}">
-			<StackPanel Style="{StaticResource HeaderContainer}" RadioButton.Checked="radioMode_Checked">
+		<Grid Grid.Row="0" Panel.ZIndex="5" Style="{StaticResource Header}">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+			<StackPanel Grid.Column="0" Style="{StaticResource HeaderContainer}" RadioButton.Checked="radioMode_Checked">
 				<RadioButton x:Name="RadioDecryption" Content="{x:Static res:Strings.SimpleAndFast}" Style="{StaticResource HeaderSimpleAndFastRadio}" />
 				<RadioButton x:Name="RadioEncryption" Content="{x:Static res:Strings.MoreFeatures}" Style="{StaticResource HeaderRadio}" />
-			
 			</StackPanel>
-		</StackPanel>
+			<ComboBox x:Name="SelectLanguage" Grid.Column="1" Background="#637a8c" HorizontalAlignment="Right" Margin="0,0,10,0" Height="20">
+				<ComboBoxItem>Укр</ComboBoxItem>
+				<ComboBoxItem>Eng</ComboBoxItem>
+				<ComboBoxItem>Рус</ComboBoxItem>
+			</ComboBox>
+		</Grid>
 		<DockPanel Name="ControlMainArea" Grid.Row="1" Panel.ZIndex="3" />
 		<Grid Grid.Row="2" Panel.ZIndex="5" Style="{StaticResource Footer}">
 			<Grid.ColumnDefinitions>

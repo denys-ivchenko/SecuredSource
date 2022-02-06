@@ -11,15 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Components\Crypton\Solution\Crypton\Crypton.csproj" />
-    <ProjectReference Include="..\..\Controls\Controls.csproj" />
-    <ProjectReference Include="..\..\Core\Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Drawing.Common">
-      <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\5.0.4\System.Drawing.Common.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\..\..\Components\Utils\Solution\Utils\Utils.csproj" />
   </ItemGroup>
 
 </Project>

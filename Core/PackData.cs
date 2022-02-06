@@ -16,8 +16,12 @@ namespace Telesyk.SecuredSource
 		#region Private declarations
 		
 		private List<FileData> _files = new List<FileData>();
+
+		private Password _password;
+
 		[NonSerialized]
 		private SortedDictionary<string, FileData> _names = new SortedDictionary<string, FileData>();
+
 		[NonSerialized]
 		private Dictionary<string, FileData> _fullNames = new Dictionary<string, FileData>();
 
@@ -25,14 +29,17 @@ namespace Telesyk.SecuredSource
 
 		#region Constructors
 
-		public PackData()
+		internal PackData(Password password, string appVersion)
 		{
-			
+			Password = password;
+			AppVersion = appVersion;
 		}
 
 		#endregion
 
 		#region Public properties
+
+		public string AppVersion { get; set; }
 
 		public FileData this[int index] { get => _files[index]; }
 
@@ -49,13 +56,15 @@ namespace Telesyk.SecuredSource
 			}
 		}
 
-		public CryptoAlgorithm Algorithm { get; internal set; }
+		public SymmetricAlgorithmName Algorithm { get => _password.Algorithm; }
 
-		public string PasswordHash { get; set; }
+		public Password Password { get => _password; set => _password = value; }
 
 		public int FileCount { get => _files.Count; }
 
 		public long TotalBytes { get; private set; }
+
+		public bool IsDeserialized { get; private set; }
 
 		#endregion
 
@@ -71,9 +80,13 @@ namespace Telesyk.SecuredSource
 
 		#region Static methods
 
-		public static byte[] Serialize(PackData packData) => serialize(packData);
+		public static byte[] Serialize(PackData packData) => serialize(packData, false);
 
-		public static PackData Deserialize(byte[] bytes) => deserialize(bytes);
+		public static PackData Deserialize(byte[] bytes) => deserialize(bytes, false);
+
+		public static byte[] Serialize(PackData packData, bool toBase64) => serialize(packData, toBase64);
+
+		public static PackData Deserialize(byte[] bytes, bool fromBase64) => deserialize(bytes, fromBase64);
 
 		#endregion
 
@@ -88,23 +101,27 @@ namespace Telesyk.SecuredSource
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-		public void OnDeserialization(object sender)
-		{
-			var files = _files;
-
-			_files = new List<FileData>();
-			_names = new SortedDictionary<string, FileData>();
-			_fullNames = new Dictionary<string, FileData>();
-
-			foreach (var file in files)
-				Add(file);
-		}
+		public void OnDeserialization(object sender) => deserialization();
 
 		#endregion
 
 		#region Private methods
 
 		#region Instance methods
+
+		private void deserialization()
+		{
+			IsDeserialized = true;
+			
+			//var files = _files;
+
+			//_files = new List<FileData>();
+			_names = new SortedDictionary<string, FileData>();
+			_fullNames = new Dictionary<string, FileData>();
+
+			foreach (var file in _files)
+				Add(file);
+		}
 
 		private void recalculateNames()
 		{
@@ -157,9 +174,13 @@ namespace Telesyk.SecuredSource
 			file.Name = calculateName(file.Name);
 
 			_names.Add(normalizeKey(file.Name), file);
-			_files.Add(file);
 
-			TotalBytes += file.ByteCount;
+			if (!IsDeserialized)
+			{
+				_files.Add(file);
+
+				TotalBytes += file.ByteCount;
+			}
 
 			return true;
 		}
@@ -211,24 +232,49 @@ namespace Telesyk.SecuredSource
 
 		#region Static methods
 
-		private static byte[] serialize(PackData pack)
+		private static byte[] serialize(PackData pack, bool toBase64)
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
 
-			using (var stream = new MemoryStream())
+			using (var data = new MemoryStream())
 			{
-				formatter.Serialize(stream, pack);
+				formatter.Serialize(data, pack);
 
-				return stream.ToArray();
+				if (!toBase64)
+					return data.ToArray();
+
+				using (var converted = new MemoryStream())
+				{
+					var base64 = Convert.ToBase64String(data.ToArray());
+					var buffer = Encoding.UTF8.GetBytes(base64);
+
+					converted.Write(buffer, 0, buffer.Length);
+
+					return converted.ToArray();
+				}
 			}
 		}
 		
-		private static PackData deserialize(byte[] bytes)
+		private static PackData deserialize(byte[] bytes, bool fromBase64)
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
 
-			using (var stream = new MemoryStream(bytes))
-				return (PackData)formatter.Deserialize(stream);
+			using (var data = new MemoryStream(bytes))
+			{
+				if (!fromBase64)
+					return (PackData)formatter.Deserialize(data);
+				
+				using (var converted = new MemoryStream())
+				{
+					var base64 = Encoding.UTF8.GetString(data.ToArray());
+					var buffer = Convert.FromBase64String(base64);
+
+					converted.Write(buffer, 0, buffer.Length);
+					converted.Position = 0;
+
+					return (PackData)formatter.Deserialize(converted);
+				}
+			}
 		}
 
 		#endregion

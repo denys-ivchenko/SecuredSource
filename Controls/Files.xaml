@@ -10,7 +10,7 @@
 	<StackPanel x:Name="PanelMainAreaLoad" Style="{StaticResource FilesArea}">
 		<TextBlock Style="{StaticResource TextCaption}"><Run Text="{x:Static res:Strings.Files}" />:</TextBlock>
 		<Border Style="{StaticResource FilesAreaBorder}">
-			<ScrollViewer Height="147">
+			<ScrollViewer Height="212">
 				<StackPanel x:Name="PanelFiles" />
 			</ScrollViewer>
 		</Border>

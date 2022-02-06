@@ -31,9 +31,16 @@ namespace Telesyk.SecuredSource.UI.Controls
 
 		private void init()
 		{
-			TextDirectory.Text = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.Directory : ApplicationSettings.Current.DecryptionDirectory;
+			TextDirectory.Text = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.EncryptionDirectory : ApplicationSettings.Current.DecryptionDirectory;
 
-			ControlStateOperator.Operator.RegisterForEncryptionProcess(TextDirectory, ButtonSelect);
+			ApplicationOperator.Operator.RegisterForEncryptionProcess(TextDirectory, ButtonSelect);
+
+			ApplicationSettings.Current.ModeChanged += (s, a) => setMode();
+		}
+
+		private void setMode()
+		{
+			TextDirectory.Text = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.EncryptionDirectory : ApplicationSettings.Current.DecryptionDirectory;
 		}
 
 		public override void OnApplyTemplate() => TextTitle.Text = Mode == ApplicationMode.Encryption ? Strings.SaveDirectory : Strings.UploadDirectory;
@@ -44,13 +51,13 @@ namespace Telesyk.SecuredSource.UI.Controls
 		{
 			forms.FolderBrowserDialog dialog = new forms.FolderBrowserDialog();
 			dialog.Description = Strings.SelectSavingDirectory;
-			dialog.SelectedPath = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.Directory : ApplicationSettings.Current.DecryptionDirectory;
+			dialog.SelectedPath = Mode == ApplicationMode.Encryption ? ApplicationSettings.Current.EncryptionDirectory : ApplicationSettings.Current.DecryptionDirectory;
 			dialog.ShowDialog();
 
 			TextDirectory.Text = dialog.SelectedPath;
 
-			if (ApplicationSettings.Current.Mode == ApplicationMode.Encryption)
-				ApplicationSettings.Current.Directory = dialog.SelectedPath;
+			if (Mode == ApplicationMode.Encryption)
+				ApplicationSettings.Current.EncryptionDirectory = dialog.SelectedPath;
 			else
 				ApplicationSettings.Current.DecryptionDirectory = dialog.SelectedPath;
 		}

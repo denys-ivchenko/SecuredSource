@@ -13,6 +13,25 @@
 				<ImageBrush ImageSource="header-bg.gif" />
 			</Setter.Value>
 		</Setter>
+		<Style.Resources>
+			<Style TargetType="ComboBox">
+				<Setter Property="Control.Foreground" Value="#637a8c" />
+				<Setter Property="Control.Background" Value="#ffffff" />
+				<Setter Property="Control.Height" Value="16" />
+			</Style>
+			<Style TargetType="ComboBoxItem">
+				<Setter Property="Control.Foreground" Value="#637a8c" />
+				<Style.Triggers>
+					<Trigger Property="IsSelected" Value="True">
+						<Setter Property="Control.Foreground" Value="#637a8c" />
+						<Setter Property="Control.FontWeight" Value="Bold" />
+					</Trigger>
+					<Trigger Property="IsMouseOver" Value="True">
+						<Setter Property="Control.Foreground" Value="#637a8c" />
+					</Trigger>
+				</Style.Triggers>
+			</Style>
+		</Style.Resources>
 	</Style>
 	<Style x:Key="HeaderContainer">
 		<Setter Property="StackPanel.Margin" Value="8,6" />
@@ -39,6 +58,8 @@
 	</Style>
 	<Style x:Key="FooterInfo" BasedOn="{StaticResource FooterControl}">
 		<Setter Property="Control.Cursor" Value="Hand" />
+		<Setter Property="Control.Width" Value="16" />
+		<Setter Property="Control.HorizontalAlignment" Value="Left" />
 	</Style>
 	<Style x:Key="FooterCopyright" BasedOn="{StaticResource FooterControl}">
 		<Setter Property="StackPanel.Orientation" Value="Horizontal" />
@@ -49,8 +70,8 @@
 		<Setter Property="Control.Foreground" Value="#b7ccdd" />
 	</Style>
 	<Style x:Key="ColumnPanel">
-		<Setter Property="ColumnDefinition.MinWidth" Value="150" />
-		<Setter Property="ColumnDefinition.MaxWidth" Value="300" />
+		<Setter Property="ColumnDefinition.MinWidth" Value="180" />
+		<Setter Property="ColumnDefinition.MaxWidth" Value="320" />
 	</Style>
 	<Style x:Key="Panel">
 		<Setter Property="DockPanel.Background" Value="#dfecf7" />
@@ -66,7 +87,8 @@
 			<Style x:Key="TextBox" BasedOn="{StaticResource Text}">
 				<Setter Property="Control.BorderBrush" Value="#b9cad7" />
 				<Setter Property="Control.BorderThickness" Value="1" />
-				<Setter Property="Control.Height" Value="20" />
+				<Setter Property="Control.Height" Value="18" />
+				<Setter Property="Control.Padding" Value="1" />
 				<Setter Property="Control.SnapsToDevicePixels" Value="True" />
 			</Style>
 			<Style TargetType="PasswordBox" BasedOn="{StaticResource TextBox}">
@@ -76,15 +98,17 @@
 
 			</Style>
 			<Style TargetType="ComboBox" BasedOn="{StaticResource TextBox}">
-
+				<Setter Property="Control.Background" Value="#ffffff" />
+				<Setter Property="Control.Height" Value="18" />
+				<Setter Property="Control.Padding" Value="4,1" />
 			</Style>
 			<Style TargetType="ComboBoxItem" BasedOn="{StaticResource Text}">
-				<Setter Property="Control.Height" Value="19" />
+				<Setter Property="Control.Padding" Value="2,1" />
 			</Style>
 			<Style TargetType="Button" BasedOn="{StaticResource TextBox}">
 				<Setter Property="Control.Margin" Value="1,0,0,0" />
-				<Setter Property="Control.Height" Value="20" />
-				<Setter Property="Control.Width" Value="20" />
+				<Setter Property="Control.Height" Value="18" />
+				<Setter Property="Control.Width" Value="18" />
 			</Style>
 		</Style.Resources>
 	</Style>
@@ -96,7 +120,7 @@
 		<Setter Property="Control.FontSize" Value="9" />
 		<Setter Property="Control.HorizontalAlignment" Value="Right" />
 		<Setter Property="Control.VerticalAlignment" Value="Bottom" />
-		<Setter Property="Control.Margin" Value="0,0,0,2" />
+		<Setter Property="Control.Margin" Value="0,0,2,2" />
 	</Style>
 	<Style x:Key="PanelFieldControl">
 		<Setter Property="Control.FontSize" Value="11" />
@@ -104,6 +128,23 @@
 		<Setter Property="Border.BorderBrush" Value="#b9cad7" />
 		<Setter Property="Border.BorderThickness" Value="1" />
 		<Setter Property="Border.SnapsToDevicePixels" Value="True" />
+	</Style>
+	<Style x:Key="PasswordHint">
+		<Setter Property="Control.FontSize" Value="11" />
+		<Setter Property="Control.Height" Value="46" />
+		<Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible" />
+		<Setter Property="Control.Foreground" Value="#19222a" />
+		<Setter Property="Border.BorderBrush" Value="#b9cad7" />
+		<Setter Property="Border.BorderThickness" Value="1" />
+		<Setter Property="Border.SnapsToDevicePixels" Value="True" />
+	</Style>
+	<Style x:Key="PasswordHintText">
+		<Setter Property="Control.FontSize" Value="11" />
+		<Setter Property="Control.FontStyle"  Value="Italic" />
+		<Setter Property="Control.Margin" Value="1,0" />
+		<Setter Property="Control.Foreground" Value="#19222a" />
+		<Setter Property="TextBlock.TextWrapping" Value="Wrap" />
 	</Style>
 	<Style x:Key="TextCaption">
 		<Setter Property="Control.Margin" Value="0,0,0,4" />
@@ -250,7 +291,7 @@
 		<Style.Resources>
 			<Style TargetType="Button">
 				<Setter Property="Button.Margin" Value="4,0,0,0" />
-				<Setter Property="Button.Width" Value="70" />
+				<Setter Property="Button.Width" Value="78" />
 			</Style>
 		</Style.Resources>
 	</Style>
@@ -289,15 +330,23 @@
 			</Style>
 		</Style.Resources>
 	</Style>
-	<Style x:Key="PasswordImage">
+	<Style x:Key="PasswordVisibility" TargetType="TextBlock">
+		<Setter Property="TextBlock.Cursor" Value="Hand" />
+		<Setter Property="TextBlock.Margin" Value="1,-9,0,0" />
+		<Setter Property="TextBlock.FontSize" Value="25" />
+		<Setter Property="TextBlock.Foreground" Value="#455868" />
+		<Setter Property="TextBlock.Opacity" Value="0.5" />
+	</Style>
+	<Style x:Key="PasswordImage" TargetType="Image">
 		<Setter Property="Image.Cursor" Value="Hand" />
-		<Setter Property="Image.Width" Value="16" />
-		<Setter Property="Image.Height" Value="16" />
-		<Setter Property="Image.Opacity" Value="1" />
+		<Setter Property="Image.Width" Value="18" />
+		<Setter Property="Image.Height" Value="18" />
+		<Setter Property="Image.Opacity" Value="0.6" />
+		<Setter Property="Image.Source" Value="\Resources\eye-closed.png" />
 		<Setter Property="Image.SnapsToDevicePixels" Value="True" />
 	</Style>
-	<Style x:Key="UnvisiblePasswordImage" BasedOn="{StaticResource PasswordImage}">
-		<Setter Property="Image.Opacity" Value="0.5" />
+	<Style x:Key="VisiblePasswordImage" TargetType="Image" BasedOn="{StaticResource PasswordImage}">
+		<Setter Property="Image.Source" Value="\Resources\eye-opened.png" />
 	</Style>
 	<Style x:Key="ProgressGrid">
 		<Setter Property="Control.Margin" Value="0,4" />
